@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Karpathy Skills 小白指南：教 AI 写出好代码的 4 条原则</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400;1,9..40,500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+:root{--color-bg:#FAF7F2;--color-bg-warm:#F5F0E8;--color-bg-code:#1E1E2E;--color-text:#2C2A28;--color-text-secondary:#6B6560;--color-text-muted:#9E9790;--color-border:#E5DFD6;--color-border-light:#EEEBE5;--color-surface:#FFFFFF;--color-surface-warm:#FDF9F3;--color-accent:#2A7B9B;--color-accent-hover:#1F6280;--color-accent-light:#E4F2F7;--color-accent-muted:#5A9DB8;--color-success:#2D8B55;--color-success-light:#E8F5EE;--color-error:#C93B3B;--color-error-light:#FDE8E8;--color-info:#D4A843;--color-info-light:#FDF4E3;--color-actor-1:#2A7B9B;--color-actor-2:#D94F30;--color-actor-3:#7B6DAA;--color-actor-4:#D4A843;--color-actor-5:#2D8B55;--font-display:'Bricolage Grotesque',Georgia,serif;--font-body:'DM Sans',-apple-system,sans-serif;--font-mono:'JetBrains Mono','Consolas',monospace;--text-xs:0.75rem;--text-sm:0.875rem;--text-base:1rem;--text-lg:1.125rem;--text-xl:1.25rem;--text-2xl:1.5rem;--text-3xl:1.875rem;--text-4xl:2.25rem;--text-5xl:3rem;--text-6xl:3.75rem;--leading-tight:1.15;--leading-snug:1.3;--leading-normal:1.6;--space-1:0.25rem;--space-2:0.5rem;--space-3:0.75rem;--space-4:1rem;--space-5:1.25rem;--space-6:1.5rem;--space-8:2rem;--space-10:2.5rem;--space-12:3rem;--space-16:4rem;--space-20:5rem;--content-width:800px;--content-width-wide:1000px;--nav-height:50px;--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-full:9999px;--shadow-sm:0 1px 2px rgba(44,42,40,0.05);--shadow-md:0 4px 12px rgba(44,42,40,0.08);--shadow-lg:0 8px 24px rgba(44,42,40,0.1);--ease-out:cubic-bezier(0.16,1,0.3,1);--duration-fast:150ms;--duration-normal:300ms;--duration-slow:500ms;--stagger-delay:120ms}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-snap-type:y proximity;scroll-behavior:smooth}
+body{font-family:var(--font-body);font-size:var(--text-base);line-height:var(--leading-normal);color:var(--color-text);background:var(--color-bg);-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--color-border);border-radius:var(--radius-full)}
+pre,code{white-space:pre-wrap;word-break:break-word;overflow-x:hidden}
+.nav{position:fixed;top:0;left:0;right:0;height:var(--nav-height);background:rgba(250,247,242,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--color-border-light);z-index:1000;display:flex;align-items:center}
+.progress-bar{position:absolute;top:0;left:0;height:3px;background:var(--color-accent);width:0%;transition:width .3s ease}
+.nav-inner{max-width:var(--content-width-wide);width:100%;margin:0 auto;padding:0 var(--space-6);display:flex;align-items:center;justify-content:space-between}
+.nav-title{font-family:var(--font-display);font-weight:700;font-size:var(--text-sm);color:var(--color-text)}
+.nav-dots{display:flex;gap:var(--space-3)}
+.nav-dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--color-text-muted);background:transparent;cursor:pointer;transition:all var(--duration-fast);padding:0}
+.nav-dot.active{border-color:var(--color-accent);background:var(--color-accent);box-shadow:0 0 0 3px var(--color-accent-light)}
+.nav-dot[data-tooltip]{position:relative}.nav-dot[data-tooltip]:hover::after{content:attr(data-tooltip);position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:6px;padding:4px 8px;background:var(--color-text);color:white;font-family:var(--font-body);font-size:var(--text-xs);white-space:nowrap;border-radius:4px}
+.module{min-height:100dvh;scroll-snap-align:start;padding:var(--space-16) var(--space-6);padding-top:calc(var(--nav-height) + var(--space-12))}
+.module-content{max-width:var(--content-width);margin:0 auto}
+.module-header{margin-bottom:var(--space-10)}
+.module-number{font-family:var(--font-display);font-size:var(--text-6xl);font-weight:800;color:var(--color-accent);opacity:.15;line-height:1}
+.module-title{font-family:var(--font-display);font-size:var(--text-4xl);font-weight:700;line-height:var(--leading-tight);margin-top:var(--space-2)}
+.module-subtitle{font-size:var(--text-lg);color:var(--color-text-secondary);margin-top:var(--space-3);line-height:var(--leading-snug)}
+.screen{margin-bottom:var(--space-12)}
+.screen-heading{font-family:var(--font-display);font-size:var(--text-2xl);font-weight:600;margin-bottom:var(--space-4);line-height:var(--leading-snug)}
+.screen p{margin-bottom:var(--space-4);color:var(--color-text-secondary)}.screen p strong{color:var(--color-text)}
+.animate-in{opacity:0;transform:translateY(20px);transition:opacity var(--duration-slow) var(--ease-out),transform var(--duration-slow) var(--ease-out)}
+.animate-in.visible{opacity:1;transform:translateY(0)}
+.stagger-children>.animate-in{transition-delay:calc(var(--stagger-index,0)*var(--stagger-delay))}
+@media(prefers-reduced-motion:reduce){.animate-in{opacity:1;transform:none;transition:none}}
+.hero{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:var(--space-16) var(--space-6);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(42,123,155,0.06) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:var(--space-2);font-family:var(--font-mono);font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.1em;color:var(--color-accent);background:var(--color-accent-light);padding:var(--space-2) var(--space-4);border-radius:var(--radius-full);margin-bottom:var(--space-6)}
+.hero h1{font-family:var(--font-display);font-size:var(--text-5xl);font-weight:800;line-height:var(--leading-tight);max-width:700px}
+.hero h1 .highlight{color:var(--color-accent);position:relative}.hero h1 .highlight::after{content:'';position:absolute;bottom:2px;left:0;right:0;height:8px;background:var(--color-accent-light);z-index:-1}
+.hero-desc{font-size:var(--text-lg);color:var(--color-text-secondary);max-width:520px;margin-top:var(--space-6)}
+.hero-stats{display:flex;gap:var(--space-8);margin-top:var(--space-10)}
+.hero-stat-num{font-family:var(--font-display);font-size:var(--text-3xl);font-weight:800;color:var(--color-accent)}
+.hero-stat-label{font-size:var(--text-sm);color:var(--color-text-muted)}
+.hero-scroll-hint{position:absolute;bottom:var(--space-8);font-size:var(--text-sm);color:var(--color-text-muted);animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+.pattern-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4);margin-top:var(--space-6)}
+.pattern-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--space-6);box-shadow:var(--shadow-sm);transition:transform var(--duration-fast),box-shadow var(--duration-fast)}
+.pattern-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.pattern-icon{width:44px;height:44px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:var(--space-3)}
+.pattern-title{font-family:var(--font-display);font-weight:600;font-size:var(--text-base);margin-bottom:var(--space-2)}
+.pattern-desc{font-size:var(--text-sm);color:var(--color-text-secondary);line-height:var(--leading-normal)}
+@media(max-width:768px){.pattern-cards{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.pattern-cards{grid-template-columns:1fr}}
+.chat-window{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);overflow:hidden;margin:var(--space-6) 0;box-shadow:var(--shadow-md)}
+.chat-header{padding:var(--space-3) var(--space-4);background:var(--color-bg-warm);border-bottom:1px solid var(--color-border-light);font-family:var(--font-display);font-weight:600;font-size:var(--text-sm);color:var(--color-text-secondary)}
+.chat-messages{padding:var(--space-4);min-height:200px;max-height:400px;overflow-y:auto}
+.chat-message{display:flex;gap:var(--space-3);margin-bottom:var(--space-4);animation:chatSlideIn .4s var(--ease-out)}
+@keyframes chatSlideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.chat-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:var(--text-xs);font-weight:700;color:white;flex-shrink:0}
+.chat-bubble{background:var(--color-bg-warm);border-radius:0 var(--radius-md) var(--radius-md) var(--radius-md);padding:var(--space-3) var(--space-4);max-width:80%}
+.chat-sender{font-family:var(--font-display);font-weight:600;font-size:var(--text-xs);display:block;margin-bottom:var(--space-1)}
+.chat-bubble p{font-size:var(--text-sm);color:var(--color-text);margin:0}
+.chat-bubble code{font-family:var(--font-mono);font-size:var(--text-xs);background:rgba(42,123,155,0.1);padding:1px 5px;border-radius:3px}
+.chat-typing{display:flex;gap:var(--space-3);align-items:center;padding:0 var(--space-4) var(--space-3)}
+.typing-dots{display:flex;gap:4px}.typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--color-text-muted);animation:typingDot 1.4s infinite}.typing-dots span:nth-child(2){animation-delay:.2s}.typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes typingDot{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+.chat-controls{padding:var(--space-3) var(--space-4);border-top:1px solid var(--color-border-light);display:flex;gap:var(--space-3);align-items:center}
+.chat-controls .btn{font-family:var(--font-body);font-size:var(--text-xs);font-weight:600;padding:var(--space-2) var(--space-4);border-radius:var(--radius-sm);cursor:pointer;border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text-secondary);transition:all var(--duration-fast)}
+.chat-controls .btn:hover{border-color:var(--color-accent);color:var(--color-accent)}
+.chat-controls .btn-primary{background:var(--color-accent);color:white;border-color:var(--color-accent)}
+.chat-controls .btn-primary:hover{background:var(--color-accent-hover)}
+.chat-progress{font-family:var(--font-mono);font-size:var(--text-xs);color:var(--color-text-muted);margin-left:auto}
+.callout{padding:var(--space-5);border-radius:var(--radius-sm);margin:var(--space-6) 0;display:flex;gap:var(--space-4);align-items:flex-start}
+.callout-accent{background:var(--color-accent-light);border-left:4px solid var(--color-accent)}
+.callout-info{background:var(--color-info-light);border-left:4px solid var(--color-info)}
+.callout-success{background:var(--color-success-light);border-left:4px solid var(--color-success)}
+.callout-icon{font-size:1.3rem;flex-shrink:0}
+.callout-content{flex:1}.callout-title{font-family:var(--font-display);font-weight:600;font-size:var(--text-base);margin-bottom:var(--space-1)}
+.callout-content p{font-size:var(--text-sm);color:var(--color-text-secondary);margin:0}
+.journey{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--space-6);margin:var(--space-6) 0;box-shadow:var(--shadow-sm)}
+.journey-title{font-family:var(--font-display);font-weight:700;font-size:var(--text-lg);text-align:center;margin-bottom:var(--space-6);color:var(--color-accent)}
+.journey-steps{display:flex;flex-direction:column;align-items:center;gap:0}
+.journey-step{display:flex;align-items:center;gap:var(--space-4);width:100%;max-width:500px}
+.journey-step-icon{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;border:2px solid var(--color-border);background:var(--color-surface);transition:all var(--duration-normal) var(--ease-out)}
+.journey-step.active .journey-step-icon{border-color:var(--color-accent);background:var(--color-accent-light);box-shadow:0 0 0 4px rgba(42,123,155,0.12);transform:scale(1.1)}
+.journey-step-label{font-family:var(--font-display);font-weight:600;font-size:var(--text-sm);margin-bottom:2px}
+.journey-step-desc{font-size:var(--text-xs);color:var(--color-text-muted);line-height:1.4}
+.journey-arrow{display:flex;justify-content:center;padding:var(--space-1) 0;color:var(--color-border);font-size:1.2rem}.journey-arrow.active{color:var(--color-accent)}
+.compare-table{width:100%;border-collapse:collapse;margin:var(--space-6) 0;font-size:var(--text-sm);background:var(--color-surface);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm)}
+.compare-table th{font-family:var(--font-display);font-weight:600;text-align:left;padding:var(--space-4);background:var(--color-bg-warm);border-bottom:2px solid var(--color-border);font-size:var(--text-sm)}
+.compare-table th:first-child{width:130px}
+.compare-table td{padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-border-light);vertical-align:top}
+.compare-table tr:last-child td{border-bottom:none}
+.compare-table .check{color:var(--color-success);font-weight:700}.compare-table .cross{color:var(--color-error);opacity:.5}
+.compare-table .highlight-col{background:var(--color-accent-light);border-left:2px solid var(--color-accent)}
+.compare-table .label-row td{font-family:var(--font-display);font-weight:600;background:var(--color-bg);padding-top:var(--space-4)}
+.compare-table a{color:inherit;text-decoration:none;border-bottom:1.5px dashed var(--color-text-muted)}.compare-table a:hover{color:var(--color-accent);border-color:var(--color-accent)}
+.mindmap{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--space-8);margin:var(--space-6) 0;box-shadow:var(--shadow-sm);position:relative;overflow:hidden}
+.mindmap-center{display:flex;flex-direction:column;align-items:center;position:relative;z-index:2}
+.mindmap-core{width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,var(--color-accent),var(--color-accent-hover));color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:var(--text-base);box-shadow:0 8px 32px rgba(42,123,155,0.25);position:relative;z-index:3}
+.mindmap-core .emoji{font-size:1.8rem;margin-bottom:2px}
+.mindmap-branches{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4);margin-top:var(--space-6)}
+.mindmap-branch{text-align:center;padding:var(--space-4);border-radius:var(--radius-sm);border:1px solid var(--color-border-light);background:var(--color-surface-warm);transition:transform var(--duration-fast),box-shadow var(--duration-fast)}
+.mindmap-branch:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.mindmap-branch-icon{font-size:1.5rem;margin-bottom:var(--space-2)}
+.mindmap-branch-title{font-family:var(--font-display);font-weight:600;font-size:var(--text-sm);margin-bottom:var(--space-1)}
+.mindmap-branch-desc{font-size:var(--text-xs);color:var(--color-text-muted);line-height:1.5}
+.mindmap-connector{position:absolute;top:50%;left:50%;width:200px;height:200px;border:2px dashed var(--color-border);border-radius:50%;transform:translate(-50%,-50%);z-index:1;animation:pulse-ring 3s infinite}
+@keyframes pulse-ring{0%,100%{opacity:.2;transform:translate(-50%,-50%) scale(1)}50%{opacity:.4;transform:translate(-50%,-50%) scale(1.05)}}
+@media(max-width:600px){.mindmap-branches{grid-template-columns:1fr 1fr}}
+.use-cases{display:grid;grid-template-columns:1fr;gap:var(--space-4);margin:var(--space-6) 0}
+.use-case-card{display:flex;gap:var(--space-5);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--space-6);box-shadow:var(--shadow-sm);transition:transform var(--duration-fast),box-shadow var(--duration-fast)}
+.use-case-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.use-case-emoji{font-size:2rem;flex-shrink:0;width:56px;height:56px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center}
+.use-case-body{flex:1}
+.use-case-role{font-family:var(--font-mono);font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.08em;color:var(--color-accent);margin-bottom:var(--space-1)}
+.use-case-title{font-family:var(--font-display);font-weight:600;font-size:var(--text-lg);margin-bottom:var(--space-2)}
+.use-case-desc{font-size:var(--text-sm);color:var(--color-text-secondary);line-height:var(--leading-normal)}.use-case-desc strong{color:var(--color-text)}
+.use-case-quote{margin-top:var(--space-3);padding:var(--space-3) var(--space-4);background:var(--color-accent-light);border-radius:var(--radius-sm);font-size:var(--text-sm);font-style:italic;color:var(--color-accent-hover)}
+.use-case-source{display:inline-flex;align-items:center;gap:6px;margin-top:var(--space-2);font-family:var(--font-mono);font-size:.7rem;color:var(--color-text-muted);font-style:normal}
+.use-case-source a{color:var(--color-text-muted);text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:color var(--duration-fast)}.use-case-source a:hover{color:var(--color-accent)}
+.source-badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.65rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#fff}
+.source-badge.github{background:#24292f}.source-badge.x{background:#0f1419}.source-badge.blog{background:#e8590c}.source-badge.dev{background:#3b49df}.source-badge.hn{background:#ff6600}
+.use-cases-group-label{font-family:var(--font-display);font-weight:700;font-size:var(--text-xl);color:var(--color-text);margin-top:var(--space-8);margin-bottom:var(--space-3);padding-bottom:var(--space-2);border-bottom:2px solid var(--color-border);display:flex;align-items:center;gap:var(--space-2)}
+@media(max-width:600px){.use-case-card{flex-direction:column}}
+.code-block{background:var(--color-bg-code);color:#CDD6F4;border-radius:var(--radius-md);padding:var(--space-6);font-family:var(--font-mono);font-size:var(--text-sm);line-height:1.8;margin:var(--space-4) 0;position:relative;overflow-x:hidden;box-shadow:var(--shadow-md)}
+.code-block .comment{color:#6C7086;font-style:italic}.code-block .cmd{color:#89B4FA}.code-block .flag{color:#CBA6F7}.code-block .str{color:#A6E3A1}
+.code-block .label{position:absolute;top:var(--space-2);right:var(--space-3);font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.1em;opacity:.4}
+.step-cards{display:flex;flex-direction:column;gap:var(--space-4);margin:var(--space-6) 0}
+.step-card{display:flex;gap:var(--space-4);align-items:flex-start}
+.step-num{width:40px;height:40px;border-radius:50%;background:var(--color-accent);color:white;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:var(--text-lg);flex-shrink:0}
+.step-body{flex:1}.step-body strong{font-family:var(--font-display);font-weight:600;display:block;margin-bottom:var(--space-1)}
+.step-body p{font-size:var(--text-sm);color:var(--color-text-secondary);margin:0}
+.term{border-bottom:1.5px dashed var(--color-accent-muted);cursor:help;position:relative}
+.term:hover::after{content:attr(data-def);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--color-text);color:white;padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm);font-size:var(--text-xs);font-family:var(--font-body);font-style:normal;white-space:normal;width:max-content;max-width:260px;z-index:100;box-shadow:var(--shadow-lg);line-height:1.4}
+.quiz{background:var(--color-surface);border:2px solid var(--color-accent);border-radius:var(--radius-md);padding:var(--space-6);margin:var(--space-8) 0;box-shadow:var(--shadow-sm)}
+.quiz-header{display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-5)}
+.quiz-icon{width:40px;height:40px;border-radius:50%;background:var(--color-accent);color:white;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.quiz-label{font-family:var(--font-display);font-weight:700;font-size:var(--text-lg);color:var(--color-accent)}
+.quiz-question{font-family:var(--font-display);font-weight:600;font-size:var(--text-base);margin-bottom:var(--space-4);line-height:var(--leading-snug)}
+.quiz-options{display:flex;flex-direction:column;gap:var(--space-2)}
+.quiz-option{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3) var(--space-4);border:1.5px solid var(--color-border);border-radius:var(--radius-sm);cursor:pointer;font-size:var(--text-sm);color:var(--color-text-secondary);transition:all var(--duration-fast);background:var(--color-surface);font-family:var(--font-body);width:100%;text-align:left}
+.quiz-option:hover{border-color:var(--color-accent-muted);background:var(--color-accent-light);color:var(--color-text)}
+.quiz-option.correct{border-color:var(--color-success);background:var(--color-success-light);color:var(--color-success);font-weight:600}
+.quiz-option.wrong{border-color:var(--color-error);background:var(--color-error-light);color:var(--color-error);opacity:.7}
+.quiz-option.disabled{pointer-events:none}
+.quiz-option-letter{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--color-border);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:var(--text-xs);font-weight:600;flex-shrink:0;transition:all var(--duration-fast)}
+.quiz-option.correct .quiz-option-letter{background:var(--color-success);color:white;border-color:var(--color-success)}
+.quiz-option.wrong .quiz-option-letter{background:var(--color-error);color:white;border-color:var(--color-error)}
+.quiz-explain{display:none;margin-top:var(--space-4);padding:var(--space-4);background:var(--color-success-light);border-radius:var(--radius-sm);border-left:3px solid var(--color-success);font-size:var(--text-sm);color:var(--color-text-secondary);line-height:var(--leading-normal)}
+.quiz-explain.show{display:block}.quiz-explain strong{color:var(--color-success)}
+.decision-flow{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--space-6);margin:var(--space-6) 0;box-shadow:var(--shadow-sm);text-align:center}
+.decision-flow-title{font-family:var(--font-display);font-weight:700;font-size:var(--text-lg);margin-bottom:var(--space-5);color:var(--color-accent)}
+.decision-node{display:inline-block;padding:var(--space-3) var(--space-5);border-radius:var(--radius-sm);font-size:var(--text-sm);font-weight:600;font-family:var(--font-display);margin:var(--space-1) 0}
+.decision-q{background:var(--color-info-light);border:2px solid var(--color-info);color:var(--color-text);border-radius:999px}
+.decision-a{background:var(--color-success-light);border:1.5px solid var(--color-success);color:var(--color-success)}
+.decision-branches{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-top:var(--space-3);text-align:center}
+.decision-branch{display:flex;flex-direction:column;align-items:center;gap:var(--space-2)}
+.decision-branch-label{font-family:var(--font-mono);font-size:var(--text-xs);font-weight:600;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.05em}
+.decision-arrow-down{color:var(--color-text-muted);font-size:1rem}
+@media(max-width:480px){.decision-branches{grid-template-columns:1fr}}
+.footer{text-align:center;padding:var(--space-10) var(--space-6);background:var(--color-bg-warm);border-top:1px solid var(--color-border-light)}
+.footer p{font-size:var(--text-sm);color:var(--color-text-muted)}.footer a{color:var(--color-accent);text-decoration:none}.footer a:hover{text-decoration:underline}
+@media(max-width:768px){:root{--text-4xl:1.875rem;--text-5xl:2.25rem;--text-6xl:3rem}}
+@media(max-width:480px){:root{--text-4xl:1.5rem;--text-5xl:1.875rem;--text-6xl:2.25rem}.module{padding:var(--space-8) var(--space-4);padding-top:calc(var(--nav-height) + var(--space-8))}.hero-stats{flex-direction:column;gap:var(--space-4)}}
+  </style>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <div class="progress-bar" id="progress-bar"></div>
+  <div class="nav-inner">
+    <span class="nav-title">Karpathy Skills 小白指南</span>
+    <div class="nav-dots" id="nav-dots">
+      <button class="nav-dot active" data-target="hero" data-tooltip="开始"></button>
+      <button class="nav-dot" data-target="module-1" data-tooltip="为什么需要"></button>
+      <button class="nav-dot" data-target="module-2" data-tooltip="四大原则"></button>
+      <button class="nav-dot" data-target="module-3" data-tooltip="全景图"></button>
+      <button class="nav-dot" data-target="module-4" data-tooltip="对比"></button>
+      <button class="nav-dot" data-target="module-5" data-tooltip="真实案例"></button>
+      <button class="nav-dot" data-target="module-6" data-tooltip="快速上手"></button>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-badge animate-in">forrestchang/andrej-karpathy-skills &middot; MIT License</div>
+  <h1 class="animate-in">教 AI 写出<br><span class="highlight">好代码</span>的 4 条原则</h1>
+  <p class="hero-desc animate-in">基于 Andrej Karpathy（前 Tesla AI 总监）的真实编码经验，<br>用一个文件让 AI 编码助手不再"乱来"。</p>
+  <div class="hero-stats animate-in">
+    <div class="hero-stat"><div class="hero-stat-num">20,400+</div><div class="hero-stat-label">GitHub Stars</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">1,600+</div><div class="hero-stat-label">Forks</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">4</div><div class="hero-stat-label">核心原则</div></div>
+  </div>
+  <div class="hero-scroll-hint">向下滚动 ↓</div>
+</section>
+
+
+<!-- MODULE 1: Why -->
+<section class="module" id="module-1" style="background:var(--color-bg-warm)">
+  <div class="module-content">
+    <header class="module-header animate-in">
+      <span class="module-number">01</span>
+      <h2 class="module-title">AI 写代码的三大"毛病"</h2>
+      <p class="module-subtitle">Karpathy 用 Claude 写了几周代码后发现：AI 虽然能干，但有三个致命缺陷</p>
+    </header>
+
+    <div class="screen animate-in">
+      <h3 class="screen-heading">看看 AI 是怎么"犯错"的</h3>
+      <p>你让 AI 帮你写代码，结果经常遇到这些情况：</p>
+
+      <div class="chat-window animate-in" id="chat-problem">
+        <div class="chat-header">对话模拟：AI 编码的日常翻车</div>
+        <div class="chat-messages" id="chat-problem-messages"></div>
+        <div class="chat-typing" id="chat-problem-typing" style="display:none">
+          <div class="chat-avatar" style="background:var(--color-actor-1)">AI</div>
+          <div class="typing-dots"><span></span><span></span><span></span></div>
+        </div>
+        <div class="chat-controls">
+          <button class="btn btn-primary chat-next-btn" data-chat="chat-problem">下一条</button>
+          <button class="btn chat-all-btn" data-chat="chat-problem">全部播放</button>
+          <button class="btn chat-reset-btn" data-chat="chat-problem">重播</button>
+          <span class="chat-progress" id="chat-problem-progress"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen animate-in">
+      <h3 class="screen-heading">三大毛病，Karpathy 替你总结了</h3>
+      <div class="pattern-cards stagger-children">
+        <div class="pattern-card animate-in">
+          <div class="pattern-icon" style="background:var(--color-error-light);color:var(--color-error);">🤫</div>
+          <div class="pattern-title">偷偷做假设</div>
+          <p class="pattern-desc">你说"导出用户数据"，它不问你要什么格式、什么范围，<strong>自己猜一个就开始写</strong>。猜错了就白写了。</p>
+        </div>
+        <div class="pattern-card animate-in">
+          <div class="pattern-icon" style="background:var(--color-info-light);color:var(--color-info);">🏗️</div>
+          <div class="pattern-title">疯狂过度设计</div>
+          <p class="pattern-desc">你要一个3行就能写完的函数，它给你搞出<strong>策略模式 + 抽象类 + 配置文件</strong>，写了 30 多行。杀鸡用牛刀。</p>
+        </div>
+        <div class="pattern-card animate-in">
+          <div class="pattern-icon" style="background:#EDE8F5;color:var(--color-actor-3);">✂️</div>
+          <div class="pattern-title">顺手乱改代码</div>
+          <p class="pattern-desc">你让它修一个 bug，它<strong>把旁边的注释改了、函数名也重构了</strong>。改的地方比你要求的多得多，还可能引入新 bug。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-accent animate-in">
+      <span class="callout-icon">💡</span>
+      <div class="callout-content">
+        <span class="callout-title">Karpathy 的原话</span>
+        <p>"它们替你做错误假设然后一路狂奔，不管理自己的困惑，不暴露不一致性，不呈现权衡取舍。" — <a href="https://x.com/karpathy/status/2015883857489522876" target="_blank" rel="noopener" style="color:var(--color-accent)">原始推文 ↗</a></p>
+      </div>
+    </div>
+
+    <div class="quiz animate-in" id="quiz-1">
+      <div class="quiz-header"><div class="quiz-icon">?</div><span class="quiz-label">检查一下你的理解</span></div>
+      <div class="quiz-question">你说"加一个折扣计算功能"，AI 最常犯的错误是什么？</div>
+      <div class="quiz-options" data-quiz="quiz-1" data-answer="2">
+        <button class="quiz-option" data-idx="0"><span class="quiz-option-letter">A</span>拒绝帮你写代码</button>
+        <button class="quiz-option" data-idx="1"><span class="quiz-option-letter">B</span>写出来的代码完全不能运行</button>
+        <button class="quiz-option" data-idx="2"><span class="quiz-option-letter">C</span>搞出策略模式、抽象类等过度复杂的设计，3 行能解决的写了 30 行</button>
+        <button class="quiz-option" data-idx="3"><span class="quiz-option-letter">D</span>只写英文注释不写中文</button>
+      </div>
+      <div class="quiz-explain" id="quiz-1-explain"><strong>正确！</strong> 这就是 Karpathy 说的"过度复杂化"。AI 特别喜欢炫技，用你根本不需要的设计模式。Karpathy Skills 的第 2 条原则"简单优先"就是解决这个问题。</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- MODULE 2: How -->
+<section class="module" id="module-2" style="background:var(--color-bg)">
+  <div class="module-content">
+    <header class="module-header animate-in">
+      <span class="module-number">02</span>
+      <h2 class="module-title">四条原则，怎么治 AI 的"毛病"</h2>
+      <p class="module-subtitle">不是一个工具，不是一个框架 — 就是一个放在项目里的文本文件</p>
+    </header>
+
+    <div class="screen animate-in">
+      <h3 class="screen-heading">它是怎么工作的？</h3>
+      <p>原理非常简单：把一个叫 <code style="font-family:var(--font-mono);font-size:var(--text-sm);background:var(--color-bg-warm);padding:2px 6px;border-radius:3px;">CLAUDE.md</code> 的文件放在你项目根目录。<span class="term" data-def="CLAUDE.md：一种特殊的 Markdown 文件。Claude Code 在工作时会自动读取这个文件里的指令，就像给 AI 下了'规矩'。">Claude Code</span> 在帮你写代码时会自动读取这个文件，按照里面的"规矩"行事。</p>
+
+      <div class="journey animate-in">
+        <div class="journey-title">你的一次编码请求经历了什么</div>
+        <div class="journey-steps">
+          <div class="journey-step active">
+            <div class="journey-step-icon" style="border-color:var(--color-actor-1);background:var(--color-accent-light);">💬</div>
+            <div class="journey-step-text"><div class="journey-step-label">你给 AI 下了个指令</div><div class="journey-step-desc">比如："帮我加一个用户导出功能"</div></div>
+          </div>
+          <div class="journey-arrow active">↓</div>
+          <div class="journey-step active">
+            <div class="journey-step-icon" style="border-color:var(--color-info);background:var(--color-info-light);">📋</div>
+            <div class="journey-step-text"><div class="journey-step-label">AI 先读 CLAUDE.md 的"规矩"</div><div class="journey-step-desc">看到第1条：不确定就要先问清楚，不能偷偷猜</div></div>
+          </div>
+          <div class="journey-arrow active">↓</div>
+          <div class="journey-step active">
+            <div class="journey-step-icon" style="border-color:var(--color-actor-3);background:#EDE8F5;">❓</div>
+            <div class="journey-step-text"><div class="journey-step-label">AI 反过来问你细节</div><div class="journey-step-desc">"导出哪些用户？什么格式？要包含哪些字段？"</div></div>
+          </div>
+          <div class="journey-arrow active">↓</div>
+          <div class="journey-step active">
+            <div class="journey-step-icon" style="border-color:var(--color-success);background:var(--color-success-light);">✍️</div>
+            <div class="journey-step-text"><div class="journey-step-label">你回答后，AI 才开始写代码</div><div class="journey-step-desc">按第2条：写最简单的实现，不过度设计</div></div>
+          </div>
+          <div class="journey-arrow active">↓</div>
+          <div class="journey-step active">
+            <div class="journey-step-icon" style="border-color:var(--color-actor-2);background:#FDE2D2;">✅</div>
+            <div class="journey-step-text"><div class="journey-step-label">只改该改的，不碰其他代码</div><div class="journey-step-desc">按第3条：精准修改，不"顺手"重构无关代码</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen animate-in">
+      <h3 class="screen-heading">四条原则速览</h3>
+      <div class="pattern-cards stagger-children" style="grid-template-columns:1fr 1fr;">
+        <div class="pattern-card animate-in">
+          <div class="pattern-icon" style="background:var(--color-accent-light);color:var(--color-accent);">🤔</div>
+          <div class="pattern-title">原则 1：先思考再编码</div>
+          <p class="pattern-desc"><strong>不确定就问，不要偷偷猜。</strong>有多种理解时，全部列出来让你选，而不是默默选一个就开始写。</p>
+        </div>
+        <div class="pattern-card animate-in">
+          <div class="pattern-icon" style="background:var(--color-success-light);color:var(--color-success);">✨</div>
+          <div class="pattern-title">原则 2：简单优先</div>
+          <p class="pattern-desc"><strong>能 3 行解决就不要写 30 行。</strong>不为"万一以后需要"建抽象层，不加没人要求的功能。</p>
+        </div>
+        <div class="pattern-card animate-in">
+          <div class="pattern-icon" style="background:var(--color-info-light);color:var(--color-info);">🎯</div>
+          <div class="pattern-title">原则 3：精准修改</div>
+          <p class="pattern-desc"><strong>只改你让改的，不碰其他代码。</strong>不"顺手"重构、不改注释、不删看着像死代码的东西。</p>
+        </div>
+        <div class="pattern-card animate-in">
+          <div class="pattern-icon" style="background:#EDE8F5;color:var(--color-actor-3);">🎯</div>
+          <div class="pattern-title">原则 4：目标驱动执行</div>
+          <p class="pattern-desc"><strong>把模糊的任务变成可验证的目标。</strong>"修复认证"→ "写一个测试复现 bug，然后让测试通过"。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz animate-in" id="quiz-2">
+      <div class="quiz-header"><div class="quiz-icon">?</div><span class="quiz-label">检查一下你的理解</span></div>
+      <div class="quiz-question">你让 AI "修复邮箱为空时的崩溃 bug"。按照 Karpathy Skills 的原则，AI 应该怎么做？</div>
+      <div class="quiz-options" data-quiz="quiz-2" data-answer="1">
+        <button class="quiz-option" data-idx="0"><span class="quiz-option-letter">A</span>修复 bug 的同时，顺便给整个文件加上类型注解和文档</button>
+        <button class="quiz-option" data-idx="1"><span class="quiz-option-letter">B</span>只修复导致崩溃的那几行代码，不碰其他东西</button>
+        <button class="quiz-option" data-idx="2"><span class="quiz-option-letter">C</span>重写整个认证模块，彻底解决所有潜在问题</button>
+        <button class="quiz-option" data-idx="3"><span class="quiz-option-letter">D</span>先花 30 分钟研究项目架构，再决定怎么改</button>
+      </div>
+      <div class="quiz-explain" id="quiz-2-explain"><strong>正确！</strong> 这就是第 3 条原则"精准修改"的核心。你说修 bug，就只修 bug。看到旁边有可以"改善"的代码？忍住。发现"死代码"？提醒你就好，不删。AI 做的改动越少越精确，引入新问题的概率就越低。</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- MODULE 3: Architecture -->
+<section class="module" id="module-3" style="background:var(--color-bg-warm)">
+  <div class="module-content">
+    <header class="module-header animate-in">
+      <span class="module-number">03</span>
+      <h2 class="module-title">项目全景图</h2>
+      <p class="module-subtitle">整个项目就是几个文件 — 简单到不可思议</p>
+    </header>
+
+    <div class="screen animate-in">
+      <div class="mindmap">
+        <div class="mindmap-center">
+          <div class="mindmap-connector"></div>
+          <div class="mindmap-core"><span class="emoji">📏</span>Karpathy<br>Skills</div>
+        </div>
+        <div class="mindmap-branches stagger-children">
+          <div class="mindmap-branch animate-in">
+            <div class="mindmap-branch-icon">📄</div>
+            <div class="mindmap-branch-title">CLAUDE.md</div>
+            <div class="mindmap-branch-desc"><strong>核心文件，~70 行规矩</strong><br>放在项目根目录，AI 自动读取。就像给 AI 定的"行为准则"</div>
+          </div>
+          <div class="mindmap-branch animate-in">
+            <div class="mindmap-branch-icon">📖</div>
+            <div class="mindmap-branch-title">EXAMPLES.md</div>
+            <div class="mindmap-branch-desc"><strong>正确 vs 错误的代码对比</strong><br>用真实代码演示每条原则。AI 看了就知道什么该做、什么不该做</div>
+          </div>
+          <div class="mindmap-branch animate-in">
+            <div class="mindmap-branch-icon">🔌</div>
+            <div class="mindmap-branch-title">插件格式</div>
+            <div class="mindmap-branch-desc"><strong>一键安装到 Claude Code</strong><br>通过 <span class="term" data-def="Claude Code 插件：可以给 AI 编码工具安装的扩展，就像给手机装 App 一样，安装后 AI 就会遵循里面的规则。">插件系统</span>安装，不用手动复制文件</div>
+          </div>
+          <div class="mindmap-branch animate-in">
+            <div class="mindmap-branch-icon">🧠</div>
+            <div class="mindmap-branch-title">Karpathy 智慧</div>
+            <div class="mindmap-branch-desc"><strong>来自真实大量编码的观察</strong><br>不是理论推导，是前 Tesla AI 总监用 AI 写了几周代码后的真实经验</div>
+          </div>
+          <div class="mindmap-branch animate-in">
+            <div class="mindmap-branch-icon">⚖️</div>
+            <div class="mindmap-branch-title">灵活权衡</div>
+            <div class="mindmap-branch-desc"><strong>不是死规矩，允许判断</strong><br>简单任务（改拼写、一行修改）不用走完整流程，AI 应自行判断</div>
+          </div>
+          <div class="mindmap-branch animate-in">
+            <div class="mindmap-branch-icon">🌐</div>
+            <div class="mindmap-branch-title">通用适配</div>
+            <div class="mindmap-branch-desc"><strong>不绑定特定语言或框架</strong><br>Python、JavaScript、Go、Rust… 任何项目都能用</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-success animate-in">
+        <span class="callout-icon">✅</span>
+        <div class="callout-content">
+          <span class="callout-title">生效的标志</span>
+          <p>安装后你会发现：diff 中不必要的改动更少了；因过度复杂导致的重写更少了；AI 会主动问你问题，而不是默默猜。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz animate-in" id="quiz-3">
+      <div class="quiz-header"><div class="quiz-icon">?</div><span class="quiz-label">检查一下你的理解</span></div>
+      <div class="quiz-question">Karpathy Skills 的本质是什么？</div>
+      <div class="quiz-options" data-quiz="quiz-3" data-answer="0">
+        <button class="quiz-option" data-idx="0"><span class="quiz-option-letter">A</span>一个放在项目里的文本文件，告诉 AI "该怎么干活"</button>
+        <button class="quiz-option" data-idx="1"><span class="quiz-option-letter">B</span>一个需要安装的复杂软件框架</button>
+        <button class="quiz-option" data-idx="2"><span class="quiz-option-letter">C</span>一个 AI 模型的微调训练方案</button>
+        <button class="quiz-option" data-idx="3"><span class="quiz-option-letter">D</span>一个收费的 SaaS 服务</button>
+      </div>
+      <div class="quiz-explain" id="quiz-3-explain"><strong>正确！</strong> 就是一个约 70 行的 Markdown 文本文件，放在项目根目录。没有什么神秘的技术，就是<strong>用文字告诉 AI 该遵守什么规矩</strong>。简单、免费、开源。这也是它能获得 20,000+ stars 的原因 — 解决了一个普遍痛点，方案又极其简单。</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- MODULE 4: Comparison -->
+<section class="module" id="module-4" style="background:var(--color-bg)">
+  <div class="module-content">
+    <header class="module-header animate-in">
+      <span class="module-number">04</span>
+      <h2 class="module-title">跟其他方案有什么不同？</h2>
+      <p class="module-subtitle">市面上有不少改善 AI 编码行为的方案，它们的思路各不相同</p>
+    </header>
+
+    <div class="screen animate-in">
+      <h3 class="screen-heading">三种不同的思路</h3>
+      <div class="pattern-cards stagger-children">
+        <div class="pattern-card animate-in" style="border:2px solid var(--color-accent);">
+          <div class="pattern-icon" style="background:var(--color-accent-light);color:var(--color-accent);">📏</div>
+          <div class="pattern-title">思路 A：编码哲学</div>
+          <p class="pattern-desc">Karpathy Skills 的方式 — 用几条<strong>通用原则</strong>改变 AI 的行为模式。极简，适用于任何项目。</p>
+        </div>
+        <div class="pattern-card animate-in">
+          <div class="pattern-icon" style="background:var(--color-info-light);color:var(--color-info);">🧰</div>
+          <div class="pattern-title">思路 B：完整工具箱</div>
+          <p class="pattern-desc">gstack 的方式 — 提供 20+ 个专门工具（审查、发布、QA…）。功能强大但学习曲线陡。</p>
+        </div>
+        <div class="pattern-card animate-in">
+          <div class="pattern-icon" style="background:#EDE8F5;color:var(--color-actor-3);">📚</div>
+          <div class="pattern-title">思路 C：规则集合</div>
+          <p class="pattern-desc">awesome-cursorrules 的方式 — 按技术栈收集大量规则文件。覆盖广但没有统一的"哲学"指导。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen animate-in">
+      <h3 class="screen-heading">详细对比</h3>
+      <table class="compare-table animate-in">
+        <thead><tr>
+          <th>特性</th>
+          <th class="highlight-col"><a href="https://github.com/forrestchang/andrej-karpathy-skills" target="_blank">Karpathy Skills ↗</a></th>
+          <th><a href="https://github.com/garrytan/gstack" target="_blank">gstack ↗</a></th>
+          <th><a href="https://github.com/steipete/agent-rules" target="_blank">agent-rules ↗</a></th>
+          <th><a href="https://github.com/PatrickJS/awesome-cursorrules" target="_blank">awesome-cursorrules ↗</a></th>
+        </tr></thead>
+        <tbody>
+          <tr class="label-row"><td colspan="5">基本信息</td></tr>
+          <tr><td>Stars</td><td class="highlight-col">20.4k</td><td>39k+</td><td>5.3k</td><td>38.9k</td></tr>
+          <tr><td>复杂度</td><td class="highlight-col"><strong>1 个文件</strong></td><td>23 个工具角色</td><td>20+ 规则文件</td><td>数百个规则</td></tr>
+          <tr><td>上手难度</td><td class="highlight-col">30 秒</td><td>需要学习</td><td>中等</td><td>按需选择</td></tr>
+          <tr class="label-row"><td colspan="5">能力范围</td></tr>
+          <tr><td>编码哲学</td><td class="highlight-col"><span class="check">&#10003;</span> 4 条原则</td><td><span class="check">&#10003;</span> 内置</td><td><span class="check">&#10003;</span></td><td><span class="cross">&#10007;</span></td></tr>
+          <tr><td>代码审查</td><td class="highlight-col"><span class="cross">&#10007;</span></td><td><span class="check">&#10003;</span> /review</td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td></tr>
+          <tr><td>跨工具</td><td class="highlight-col">Claude Code</td><td>Claude Code</td><td>Claude + Cursor</td><td>仅 Cursor</td></tr>
+          <tr class="label-row"><td colspan="5">适合谁</td></tr>
+          <tr><td>目标用户</td><td class="highlight-col">所有 AI 编码者</td><td>全栈开发者</td><td>iOS/Mac 开发者</td><td>Cursor 用户</td></tr>
+          <tr><td>核心优势</td><td class="highlight-col"><strong>极简 + 名人背书</strong></td><td>功能最全面</td><td>实战经验</td><td>技术栈覆盖广</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="screen animate-in">
+      <div class="decision-flow animate-in">
+        <div class="decision-flow-title">不知道选哪个？跟着这个流程走</div>
+        <div class="decision-node decision-q">你用什么 AI 编码工具？</div>
+        <div class="decision-branches">
+          <div class="decision-branch">
+            <div class="decision-branch-label">Cursor</div>
+            <div class="decision-arrow-down">↓</div>
+            <div class="decision-node decision-a">awesome-cursorrules</div>
+            <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:4px;">按你的技术栈选规则</div>
+          </div>
+          <div class="decision-branch">
+            <div class="decision-branch-label">Claude Code</div>
+            <div class="decision-arrow-down">↓</div>
+            <div class="decision-node decision-q" style="font-size:var(--text-xs);">你想要什么？</div>
+            <div class="decision-branches" style="margin-top:var(--space-2);">
+              <div class="decision-branch">
+                <div class="decision-branch-label" style="font-size:.6rem;">轻量规矩</div>
+                <div class="decision-arrow-down">↓</div>
+                <div class="decision-node decision-a" style="background:var(--color-accent-light);border-color:var(--color-accent);color:var(--color-accent);">Karpathy Skills ✓</div>
+                <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:4px;">30 秒安装，即刻生效</div>
+              </div>
+              <div class="decision-branch">
+                <div class="decision-branch-label" style="font-size:.6rem;">完整工具箱</div>
+                <div class="decision-arrow-down">↓</div>
+                <div class="decision-node decision-a">gstack</div>
+                <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:4px;">功能最强，学习曲线陡</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-info animate-in">
+        <span class="callout-icon">💡</span>
+        <div class="callout-content">
+          <span class="callout-title">小提示：它们可以叠加使用</span>
+          <p>Karpathy Skills 是"心法"，gstack 是"工具箱"。你完全可以两个都装 — Karpathy 管 AI 怎么思考，gstack 管 AI 怎么做事。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- MODULE 5: Real Use Cases -->
+<section class="module" id="module-5" style="background:var(--color-bg-warm)">
+  <div class="module-content">
+    <header class="module-header animate-in">
+      <span class="module-number">05</span>
+      <h2 class="module-title">真实案例：谁在用、怎么评价</h2>
+      <p class="module-subtitle">来自 GitHub、X/Twitter、技术博客的真实反馈</p>
+    </header>
+
+    <div class="use-cases-group-label animate-in"><span style="font-size:1.2em">🧠</span> 灵感来源：Karpathy 的原始观察</div>
+    <div class="screen">
+      <div class="use-cases stagger-children">
+        <div class="use-case-card animate-in" style="border:2px solid var(--color-accent);">
+          <div class="use-case-emoji" style="background:var(--color-accent-light);">🔬</div>
+          <div class="use-case-body">
+            <div class="use-case-role">Andrej Karpathy · 前 Tesla AI 总监（8.25M 阅读）</div>
+            <div class="use-case-title">从 80% 手写到 80% AI 编码的转变</div>
+            <p class="use-case-desc">Karpathy 分享了自己从 2025年11月到12月的编码方式巨变：从 80% 手动 + 20% AI，翻转到 <strong>80% AI 编码 + 20% 手动修改</strong>。他称这是"约 20 年来基本编码工作流的最大变化"，同时指出了 AI 的三大行为缺陷。</p>
+            <div class="use-case-quote">"I've never felt so mass-deskilled as a programmer in my life." — 我从未如此感到作为程序员的落后。
+              <div class="use-case-source"><a href="https://x.com/karpathy/status/2004607146781278521" target="_blank" rel="noopener"><span class="source-badge x">X</span> @karpathy · 8.25M Views · 38.7K Likes ↗</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="use-cases-group-label animate-in"><span style="font-size:1.2em">𝕏</span> 作者与 GitHub Trending</div>
+    <div class="screen">
+      <div class="use-cases stagger-children">
+        <div class="use-case-card animate-in">
+          <div class="use-case-emoji" style="background:var(--color-info-light);">⚡</div>
+          <div class="use-case-body">
+            <div class="use-case-role">Jiayuan Zhang · @jiayuan_jy 项目作者</div>
+            <div class="use-case-title">让 Claude 自我审查，从 800 行精简到 70 行</div>
+            <p class="use-case-desc">作者 Jiayuan Zhang 先让 Claude 把 Karpathy 的推文转化成 agent skills，生成了约 <strong>800 行描述</strong>。然后让 Claude 用自己生成的 skills 来审查自己 — 结果自动精简到了 <strong>70 行</strong>干净指令。</p>
+            <div class="use-case-quote">"I let Claude Code turn @karpathy's post into agent skills... Then I let it use these agent skills to review itself. Boom, it cut itself down to 70 lines."
+              <div class="use-case-source"><a href="https://x.com/jiayuan_jy/status/2015998216517583211" target="_blank" rel="noopener"><span class="source-badge x">X</span> @jiayuan_jy · 项目起源推文 ↗</a></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="use-case-card animate-in">
+          <div class="use-case-emoji" style="background:var(--color-success-light);">📈</div>
+          <div class="use-case-body">
+            <div class="use-case-role">GitHub Trending · 连续多天 #1</div>
+            <div class="use-case-title">4 月单月 +10,670 Stars</div>
+            <p class="use-case-desc">2026 年 4 月 8 日起，项目连续多天位居 GitHub Trending <strong>#1</strong>。单日最高新增 3,162 stars（4月12日）。4 月单月累计 <strong>+10,670 stars、+883 forks</strong>，增长势头极为猛烈。</p>
+            <div class="use-case-quote">"从 4月5日的 +27 stars 到 4月12日的 +3,162 stars — 一周内爆发式增长 117 倍。"
+              <div class="use-case-source"><a href="https://trendshift.io/repositories/17102" target="_blank" rel="noopener"><span class="source-badge github">GitHub</span> Trending 数据 ↗</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="use-cases-group-label animate-in"><span style="font-size:1.2em">👥</span> 社区真实反馈</div>
+    <div class="screen">
+      <div class="use-cases stagger-children">
+        <div class="use-case-card animate-in">
+          <div class="use-case-emoji" style="background:var(--color-info-light);">🏗️</div>
+          <div class="use-case-body">
+            <div class="use-case-role">otonashi-labs · GitHub Issue #11 · 真实 Case Study</div>
+            <div class="use-case-title">基于四原则构建了 6 步人机协作模式</div>
+            <p class="use-case-desc">用户 otonashi-labs 将 Karpathy 原则演变为完整的开发框架：先定义第一性原理 → 画思维导图 → 收敛范围 → 构建 → 检查假设 → 验证修正。有用户基于此模式运行 <strong>6 个 AI Agent 并行的大规模生产系统</strong>（单次会话 50+ 子 Agent）。</p>
+            <div class="use-case-quote">"large-scale multi-agent production system (6 specialized AI agents running in parallel tabs on Claude Code with Opus, 50+ sub-agents per session)"
+              <div class="use-case-source"><a href="https://github.com/forrestchang/andrej-karpathy-skills/issues/11" target="_blank" rel="noopener"><span class="source-badge github">GitHub</span> Issue #11 Case Study ↗</a></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="use-case-card animate-in">
+          <div class="use-case-emoji" style="background:#EDE8F5;">📝</div>
+          <div class="use-case-body">
+            <div class="use-case-role">Medium · 多篇技术文章</div>
+            <div class="use-case-title">多个技术博主写了介绍和实践文章</div>
+            <p class="use-case-desc"><strong>Youssef Hosni</strong>（Level Up Coding）写了"Turning Karpathy's Thoughts into CLAUDE.md"；<strong>Code Coup</strong>（Coding Nexus）标题直接是"I Fixed AI Coding With One File"。说明这个项目引起了技术写作社区的广泛关注。</p>
+            <div class="use-case-quote">"I Fixed AI Coding With One File — Karpathy-inspired CLAUDE.md"
+              <div class="use-case-source"><a href="https://levelup.gitconnected.com/turning-andrej-karpathys-llm-coding-thoughts-into-claude-md-6668bbe748b5" target="_blank" rel="noopener"><span class="source-badge dev">Medium</span> Level Up Coding ↗</a></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="use-case-card animate-in">
+          <div class="use-case-emoji" style="background:var(--color-error-light);">🔍</div>
+          <div class="use-case-body">
+            <div class="use-case-role">NancyAurum · GitHub Issue #40 · 诚实质疑</div>
+            <div class="use-case-title">社区的诚实反思：通用指南的局限</div>
+            <p class="use-case-desc">用户让 Claude Opus 4.6 自己评估这个 CLAUDE.md，结论是：<strong>通用指南会消耗上下文窗口的 token</strong>，可能不如项目特定的记忆和规则有价值。每个 token 花在通用规则上，就少了一个理解实际代码库的预算。</p>
+            <div class="use-case-quote">"Every token spent on generic rules is a token not spent on understanding the actual codebase."
+              <div class="use-case-source"><a href="https://github.com/forrestchang/andrej-karpathy-skills/issues/40" target="_blank" rel="noopener"><span class="source-badge github">GitHub</span> Issue #40 ↗</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-info animate-in">
+        <span class="callout-icon">⏰</span>
+        <div class="callout-content">
+          <span class="callout-title">关于用户反馈的真实情况</span>
+          <p>20,000+ Stars 主要反映的是 Karpathy 品牌的号召力和话题热度。Reddit、Hacker News 上暂无专门讨论帖。深度使用反馈（"装了后代码质量真的变好了"）还需要更多时间积累。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- MODULE 6: Quick Start -->
+<section class="module" id="module-6" style="background:var(--color-bg)">
+  <div class="module-content">
+    <header class="module-header animate-in">
+      <span class="module-number">06</span>
+      <h2 class="module-title">最简单的上手方式</h2>
+      <p class="module-subtitle">三种安装方式，选最适合你的</p>
+    </header>
+
+    <div class="screen animate-in">
+      <h3 class="screen-heading">方式一：一键安装（推荐）</h3>
+      <p>如果你用 <span class="term" data-def="Claude Code：Anthropic 出品的 AI 编码工具，在终端（命令行）中运行，帮你写代码、改代码、debug。">Claude Code</span>，直接在终端运行：</p>
+
+      <div class="step-cards stagger-children">
+        <div class="step-card animate-in">
+          <div class="step-num">1</div>
+          <div class="step-body"><strong>安装插件</strong><p>打开终端，输入下面这行命令：</p></div>
+        </div>
+      </div>
+      <div class="code-block"><span class="label">TERMINAL</span>
+<span class="cmd">claude</span> <span class="flag">plugins</span> add forrestchang/andrej-karpathy-skills</div>
+    </div>
+
+    <div class="screen animate-in">
+      <h3 class="screen-heading">方式二：手动下载（万能方法）</h3>
+      <p>不管用什么工具，直接把文件下载到你的项目里就行：</p>
+
+      <div class="step-cards stagger-children">
+        <div class="step-card animate-in">
+          <div class="step-num">1</div>
+          <div class="step-body"><strong>下载 CLAUDE.md 到你的项目根目录</strong><p>一行命令搞定：</p></div>
+        </div>
+      </div>
+      <div class="code-block"><span class="label">TERMINAL</span>
+<span class="comment"># 进入你的项目目录</span>
+<span class="cmd">cd</span> <span class="str">~/你的项目/</span>
+
+<span class="comment"># 下载 CLAUDE.md</span>
+<span class="cmd">curl</span> <span class="flag">-o</span> CLAUDE.md https://raw.githubusercontent.com/forrestchang/andrej-karpathy-skills/main/CLAUDE.md</div>
+
+      <div class="step-cards stagger-children">
+        <div class="step-card animate-in">
+          <div class="step-num">2</div>
+          <div class="step-body"><strong>（可选）也下载示例文件</strong><p>帮 AI 更好理解什么是"正确做法"：</p></div>
+        </div>
+      </div>
+      <div class="code-block"><span class="label">TERMINAL</span>
+<span class="cmd">curl</span> <span class="flag">-o</span> EXAMPLES.md https://raw.githubusercontent.com/forrestchang/andrej-karpathy-skills/main/EXAMPLES.md</div>
+
+      <div class="step-cards stagger-children">
+        <div class="step-card animate-in">
+          <div class="step-num">3</div>
+          <div class="step-body"><strong>开始用 Claude Code 写代码</strong><p>CLAUDE.md 会被自动读取，AI 的行为会立刻改变。</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-success animate-in">
+      <span class="callout-icon">🎉</span>
+      <div class="callout-content">
+        <span class="callout-title">就这么简单！</span>
+        <p>装完后正常用 Claude Code 写代码就行。你会发现 AI 开始<strong>主动问你问题</strong>而不是偷偷猜，写出来的代码<strong>更简洁</strong>，改动范围<strong>更精准</strong>。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <p>Karpathy Skills 小白指南 &middot; 基于 <a href="https://github.com/forrestchang/andrej-karpathy-skills" target="_blank">forrestchang/andrej-karpathy-skills</a> &middot; MIT License</p>
+  <p style="margin-top:var(--space-2);">灵感来源: <a href="https://x.com/karpathy/status/2015883857489522876" target="_blank">Andrej Karpathy 的 Claude Code 观察</a></p>
+</footer>
+
+<script>
+const observer=new IntersectionObserver(e=>{e.forEach(e=>{e.isIntersecting&&(e.target.classList.add('visible'),observer.unobserve(e.target))})},{rootMargin:'0px 0px -10% 0px',threshold:.1});
+document.querySelectorAll('.animate-in').forEach(e=>observer.observe(e));
+document.querySelectorAll('.stagger-children').forEach(p=>{Array.from(p.children).forEach((c,i)=>{c.style.setProperty('--stagger-index',i)})});
+const progressBar=document.getElementById('progress-bar');
+window.addEventListener('scroll',()=>{const s=window.scrollY,h=document.documentElement.scrollHeight-window.innerHeight;progressBar.style.width=(h>0?(s/h)*100:0)+'%'},{passive:true});
+const navDots=document.querySelectorAll('.nav-dot'),sections=[];
+navDots.forEach(d=>{const t=document.getElementById(d.dataset.target);if(t){sections.push({dot:d,target:t});d.addEventListener('click',()=>{t.scrollIntoView({behavior:'smooth'})})}});
+const sectionObserver=new IntersectionObserver(e=>{e.forEach(e=>{if(e.isIntersecting){navDots.forEach(d=>d.classList.remove('active'));const m=sections.find(s=>s.target===e.target);if(m)m.dot.classList.add('active')}})},{threshold:.3});
+sections.forEach(s=>sectionObserver.observe(s.target));
+const chatData={'chat-problem':[
+{sender:'你',color:'var(--color-actor-5)',avatar:'你',text:'帮我加一个用户数据导出功能'},
+{sender:'AI',color:'var(--color-actor-1)',avatar:'AI',text:'好的！我来帮你实现。我会导出所有用户的全部字段到 CSV 文件...（开始写 200 行代码）'},
+{sender:'你',color:'var(--color-actor-5)',avatar:'你',text:'等等，我只需要导出 VIP 用户的邮箱啊...'},
+{sender:'AI',color:'var(--color-actor-1)',avatar:'AI',text:'抱歉！让我重新写。顺便我帮你把旁边的用户列表组件也重构一下吧，看着不太规范...'},
+{sender:'你',color:'var(--color-actor-5)',avatar:'你',text:'我没让你改那个！现在用户列表页挂了 😱'},
+{sender:'旁白',color:'var(--color-actor-4)',avatar:'💡',text:'如果 AI 遵循 Karpathy 的 4 条原则：它会先问"导出哪些用户？什么字段？什么格式？"然后只写最简单的实现，绝不碰其他代码。'}
+]};
+const chatStates={};function initChat(id){chatStates[id]={current:0,playing:false}}
+Object.keys(chatData).forEach(initChat);
+function showNextMessage(id){const s=chatStates[id],m=chatData[id];if(!m||s.current>=m.length)return;const c=document.getElementById(id+'-messages'),t=document.getElementById(id+'-typing'),p=document.getElementById(id+'-progress'),msg=m[s.current];t.style.display='flex';t.querySelector('.chat-avatar').style.background=msg.color;t.querySelector('.chat-avatar').textContent=msg.avatar;setTimeout(()=>{t.style.display='none';const el=document.createElement('div');el.className='chat-message';el.innerHTML=`<div class="chat-avatar" style="background:${msg.color}">${msg.avatar}</div><div class="chat-bubble"><span class="chat-sender" style="color:${msg.color}">${msg.sender}</span><p>${msg.text}</p></div>`;c.appendChild(el);c.scrollTop=c.scrollHeight;s.current++;if(p)p.textContent=s.current+' / '+m.length},800)}
+function playAll(id){const s=chatStates[id],m=chatData[id];if(s.playing)return;s.playing=true;function next(){if(s.current<m.length){showNextMessage(id);setTimeout(next,1400)}else s.playing=false}next()}
+function resetChat(id){document.getElementById(id+'-messages').innerHTML='';chatStates[id]={current:0,playing:false};const p=document.getElementById(id+'-progress');if(p)p.textContent=''}
+document.querySelectorAll('.chat-next-btn').forEach(b=>{b.addEventListener('click',()=>showNextMessage(b.dataset.chat))});
+document.querySelectorAll('.chat-all-btn').forEach(b=>{b.addEventListener('click',()=>playAll(b.dataset.chat))});
+document.querySelectorAll('.chat-reset-btn').forEach(b=>{b.addEventListener('click',()=>resetChat(b.dataset.chat))});
+document.querySelectorAll('.quiz-options').forEach(o=>{const q=o.dataset.quiz,a=parseInt(o.dataset.answer,10),bs=o.querySelectorAll('.quiz-option'),ex=document.getElementById(q+'-explain');bs.forEach(b=>{b.addEventListener('click',()=>{const i=parseInt(b.dataset.idx,10);bs.forEach(x=>x.classList.add('disabled'));if(i===a)b.classList.add('correct');else{b.classList.add('wrong');bs[a].classList.add('correct')}if(ex)ex.classList.add('show')})})});
+document.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA'].includes(e.target.tagName))return;const ci=sections.findIndex(s=>s.dot.classList.contains('active'));if(e.key==='ArrowDown'||e.key==='ArrowRight'){e.preventDefault();if(ci<sections.length-1)sections[ci+1].target.scrollIntoView({behavior:'smooth'})}if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault();if(ci>0)sections[ci-1].target.scrollIntoView({behavior:'smooth'})}});
+</script>
+</body>
+</html>

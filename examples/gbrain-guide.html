@@ -1,0 +1,2352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GBrain 小白指南：给 AI 装一个长期记忆</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400;1,9..40,500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ===========================================
+       CSS CUSTOM PROPERTIES
+       =========================================== */
+    :root {
+      --color-bg:             #FAF7F2;
+      --color-bg-warm:        #F5F0E8;
+      --color-bg-code:        #1E1E2E;
+      --color-text:           #2C2A28;
+      --color-text-secondary: #6B6560;
+      --color-text-muted:     #9E9790;
+      --color-border:         #E5DFD6;
+      --color-border-light:   #EEEBE5;
+      --color-surface:        #FFFFFF;
+      --color-surface-warm:   #FDF9F3;
+
+      --color-accent:         #2A7B9B;
+      --color-accent-hover:   #1F6280;
+      --color-accent-light:   #E4F2F7;
+      --color-accent-muted:   #5A9DB8;
+
+      --color-success:        #2D8B55;
+      --color-success-light:  #E8F5EE;
+      --color-error:          #C93B3B;
+      --color-error-light:    #FDE8E8;
+      --color-info:           #D4A843;
+      --color-info-light:     #FDF4E3;
+
+      --color-actor-1:        #2A7B9B;
+      --color-actor-2:        #D94F30;
+      --color-actor-3:        #7B6DAA;
+      --color-actor-4:        #D4A843;
+      --color-actor-5:        #2D8B55;
+
+      --font-display: 'Bricolage Grotesque', Georgia, serif;
+      --font-body:    'DM Sans', -apple-system, sans-serif;
+      --font-mono:    'JetBrains Mono', 'Consolas', monospace;
+
+      --text-xs:   0.75rem;
+      --text-sm:   0.875rem;
+      --text-base: 1rem;
+      --text-lg:   1.125rem;
+      --text-xl:   1.25rem;
+      --text-2xl:  1.5rem;
+      --text-3xl:  1.875rem;
+      --text-4xl:  2.25rem;
+      --text-5xl:  3rem;
+      --text-6xl:  3.75rem;
+
+      --leading-tight:  1.15;
+      --leading-snug:   1.3;
+      --leading-normal: 1.6;
+
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
+      --space-4: 1rem;    --space-5: 1.25rem; --space-6: 1.5rem;
+      --space-8: 2rem;    --space-10: 2.5rem; --space-12: 3rem;
+      --space-16: 4rem;   --space-20: 5rem;
+
+      --content-width: 800px;
+      --content-width-wide: 1000px;
+      --nav-height: 50px;
+      --radius-sm: 8px;  --radius-md: 12px; --radius-lg: 16px;
+      --radius-full: 9999px;
+
+      --shadow-sm:  0 1px 2px rgba(44,42,40,0.05);
+      --shadow-md:  0 4px 12px rgba(44,42,40,0.08);
+      --shadow-lg:  0 8px 24px rgba(44,42,40,0.1);
+
+      --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+      --duration-fast: 150ms;
+      --duration-normal: 300ms;
+      --duration-slow: 500ms;
+      --stagger-delay: 120ms;
+    }
+
+    /* ===========================================
+       RESET & BASE
+       =========================================== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-snap-type: y proximity;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: var(--leading-normal);
+      color: var(--color-text);
+      background: var(--color-bg);
+      background-image: radial-gradient(ellipse at 20% 50%, rgba(42,123,155,0.03) 0%, transparent 50%);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: var(--radius-full); }
+
+    pre, code {
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow-x: hidden;
+    }
+
+    /* ===========================================
+       NAVIGATION
+       =========================================== */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: var(--nav-height);
+      background: rgba(250,247,242,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--color-border-light);
+      z-index: 1000;
+      display: flex; align-items: center;
+    }
+    .progress-bar {
+      position: absolute; top: 0; left: 0;
+      height: 3px; background: var(--color-accent);
+      width: 0%; transition: width 0.3s ease;
+    }
+    .nav-inner {
+      max-width: var(--content-width-wide);
+      width: 100%; margin: 0 auto;
+      padding: 0 var(--space-6);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-title {
+      font-family: var(--font-display);
+      font-weight: 700; font-size: var(--text-sm);
+      color: var(--color-text);
+    }
+    .nav-dots {
+      display: flex; gap: var(--space-3);
+    }
+    .nav-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 2px solid var(--color-text-muted);
+      background: transparent; cursor: pointer;
+      transition: all var(--duration-fast);
+      padding: 0;
+    }
+    .nav-dot.active {
+      border-color: var(--color-accent);
+      background: var(--color-accent);
+      box-shadow: 0 0 0 3px var(--color-accent-light);
+    }
+    .nav-dot[data-tooltip] { position: relative; }
+    .nav-dot[data-tooltip]:hover::after {
+      content: attr(data-tooltip);
+      position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+      margin-top: 6px; padding: 4px 8px;
+      background: var(--color-text); color: white;
+      font-family: var(--font-body); font-size: var(--text-xs);
+      white-space: nowrap; border-radius: 4px;
+    }
+
+    /* ===========================================
+       MODULE STRUCTURE
+       =========================================== */
+    .module {
+      min-height: 100dvh;
+      scroll-snap-align: start;
+      padding: var(--space-16) var(--space-6);
+      padding-top: calc(var(--nav-height) + var(--space-12));
+    }
+    .module-content {
+      max-width: var(--content-width);
+      margin: 0 auto;
+    }
+    .module-header { margin-bottom: var(--space-10); }
+    .module-number {
+      font-family: var(--font-display);
+      font-size: var(--text-6xl);
+      font-weight: 800;
+      color: var(--color-accent);
+      opacity: 0.15;
+      line-height: 1;
+    }
+    .module-title {
+      font-family: var(--font-display);
+      font-size: var(--text-4xl);
+      font-weight: 700;
+      line-height: var(--leading-tight);
+      margin-top: var(--space-2);
+    }
+    .module-subtitle {
+      font-size: var(--text-lg);
+      color: var(--color-text-secondary);
+      margin-top: var(--space-3);
+      line-height: var(--leading-snug);
+    }
+
+    .screen { margin-bottom: var(--space-12); }
+    .screen-heading {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 600;
+      margin-bottom: var(--space-4);
+      line-height: var(--leading-snug);
+    }
+    .screen p {
+      margin-bottom: var(--space-4);
+      color: var(--color-text-secondary);
+    }
+    .screen p strong { color: var(--color-text); }
+
+    /* ===========================================
+       ANIMATIONS
+       =========================================== */
+    .animate-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity var(--duration-slow) var(--ease-out),
+                  transform var(--duration-slow) var(--ease-out);
+    }
+    .animate-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .stagger-children > .animate-in {
+      transition-delay: calc(var(--stagger-index, 0) * var(--stagger-delay));
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .animate-in { opacity: 1; transform: none; transition: none; }
+    }
+
+    /* ===========================================
+       HERO SECTION
+       =========================================== */
+    .hero {
+      min-height: 100dvh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: var(--space-16) var(--space-6);
+      background: var(--color-bg);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(42,123,155,0.06) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: var(--space-2);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-accent);
+      background: var(--color-accent-light);
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-full);
+      margin-bottom: var(--space-6);
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: var(--text-5xl);
+      font-weight: 800;
+      line-height: var(--leading-tight);
+      max-width: 700px;
+    }
+    .hero h1 .highlight {
+      color: var(--color-accent);
+      position: relative;
+    }
+    .hero h1 .highlight::after {
+      content: '';
+      position: absolute;
+      bottom: 2px; left: 0; right: 0;
+      height: 8px;
+      background: var(--color-accent-light);
+      z-index: -1;
+    }
+    .hero-desc {
+      font-size: var(--text-lg);
+      color: var(--color-text-secondary);
+      max-width: 500px;
+      margin-top: var(--space-6);
+    }
+    .hero-stats {
+      display: flex; gap: var(--space-8);
+      margin-top: var(--space-10);
+    }
+    .hero-stat {
+      text-align: center;
+    }
+    .hero-stat-num {
+      font-family: var(--font-display);
+      font-size: var(--text-3xl);
+      font-weight: 800;
+      color: var(--color-accent);
+    }
+    .hero-stat-label {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+    }
+    .hero-scroll-hint {
+      position: absolute; bottom: var(--space-8);
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(8px); }
+    }
+
+    /* ===========================================
+       PATTERN / FEATURE CARDS
+       =========================================== */
+    .pattern-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+      margin-top: var(--space-6);
+    }
+    .pattern-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-sm);
+      transition: transform var(--duration-fast), box-shadow var(--duration-fast);
+    }
+    .pattern-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .pattern-icon {
+      width: 44px; height: 44px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: var(--space-3);
+    }
+    .pattern-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: var(--text-base);
+      margin-bottom: var(--space-2);
+    }
+    .pattern-desc {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: var(--leading-normal);
+    }
+
+    @media (max-width: 768px) {
+      .pattern-cards { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .pattern-cards { grid-template-columns: 1fr; }
+    }
+
+    /* ===========================================
+       FLOW ANIMATION (Data Flow)
+       =========================================== */
+    .flow-animation {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-6);
+      margin: var(--space-8) 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .flow-actors {
+      display: flex; justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--space-6);
+      position: relative;
+    }
+    .flow-actor {
+      display: flex; flex-direction: column;
+      align-items: center; gap: var(--space-2);
+      text-align: center;
+      flex: 1;
+      position: relative;
+      z-index: 2;
+    }
+    .flow-actor-icon {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      border: 2px solid var(--color-border);
+      background: var(--color-surface);
+      transition: all var(--duration-normal) var(--ease-out);
+    }
+    .flow-actor.highlighted .flow-actor-icon {
+      border-color: var(--color-accent);
+      background: var(--color-accent-light);
+      box-shadow: 0 0 0 4px rgba(42,123,155,0.15);
+      transform: scale(1.1);
+    }
+    .flow-actor span {
+      font-size: var(--text-xs);
+      font-family: var(--font-mono);
+      color: var(--color-text-muted);
+    }
+    .flow-step-label-box {
+      text-align: center;
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      min-height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      padding: var(--space-3);
+      background: var(--color-accent-light);
+      border-radius: var(--radius-sm);
+      margin-bottom: var(--space-4);
+      transition: all var(--duration-normal);
+    }
+    .flow-controls {
+      display: flex; align-items: center; gap: var(--space-3);
+    }
+    .flow-controls .btn {
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      padding: var(--space-2) var(--space-5);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      border: none;
+      transition: all var(--duration-fast);
+    }
+    .flow-next-btn {
+      background: var(--color-accent);
+      color: white;
+    }
+    .flow-next-btn:hover { background: var(--color-accent-hover); }
+    .flow-reset-btn {
+      background: var(--color-surface);
+      color: var(--color-text-secondary);
+      border: 1px solid var(--color-border) !important;
+    }
+    .flow-progress {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      margin-left: auto;
+    }
+
+    /* ===========================================
+       CHAT ANIMATION (Group Chat)
+       =========================================== */
+    .chat-window {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin: var(--space-6) 0;
+      box-shadow: var(--shadow-md);
+    }
+    .chat-header {
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-bg-warm);
+      border-bottom: 1px solid var(--color-border-light);
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+    }
+    .chat-messages {
+      padding: var(--space-4);
+      min-height: 200px;
+      max-height: 360px;
+      overflow-y: auto;
+    }
+    .chat-message {
+      display: flex; gap: var(--space-3);
+      margin-bottom: var(--space-4);
+      animation: chatSlideIn 0.4s var(--ease-out);
+    }
+    @keyframes chatSlideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .chat-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+    .chat-bubble {
+      background: var(--color-bg-warm);
+      border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+      max-width: 80%;
+    }
+    .chat-sender {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: var(--text-xs);
+      display: block;
+      margin-bottom: var(--space-1);
+    }
+    .chat-bubble p {
+      font-size: var(--text-sm);
+      color: var(--color-text);
+      margin: 0;
+    }
+    .chat-bubble code {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      background: rgba(42,123,155,0.1);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+    .chat-typing {
+      display: flex; gap: var(--space-3); align-items: center;
+      padding: 0 var(--space-4) var(--space-3);
+    }
+    .typing-dots { display: flex; gap: 4px; }
+    .typing-dots span {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--color-text-muted);
+      animation: typingDot 1.4s infinite;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingDot {
+      0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+      30% { opacity: 1; transform: translateY(-4px); }
+    }
+    .chat-controls {
+      padding: var(--space-3) var(--space-4);
+      border-top: 1px solid var(--color-border-light);
+      display: flex; gap: var(--space-3); align-items: center;
+    }
+    .chat-controls .btn {
+      font-family: var(--font-body);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+      color: var(--color-text-secondary);
+      transition: all var(--duration-fast);
+    }
+    .chat-controls .btn:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+    .chat-controls .btn-primary {
+      background: var(--color-accent);
+      color: white;
+      border-color: var(--color-accent);
+    }
+    .chat-controls .btn-primary:hover { background: var(--color-accent-hover); }
+    .chat-progress {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      margin-left: auto;
+    }
+
+    /* ===========================================
+       CALLOUT BOXES
+       =========================================== */
+    .callout {
+      padding: var(--space-5);
+      border-radius: var(--radius-sm);
+      margin: var(--space-6) 0;
+      display: flex; gap: var(--space-4); align-items: flex-start;
+    }
+    .callout-accent {
+      background: var(--color-accent-light);
+      border-left: 4px solid var(--color-accent);
+    }
+    .callout-info {
+      background: var(--color-info-light);
+      border-left: 4px solid var(--color-info);
+    }
+    .callout-success {
+      background: var(--color-success-light);
+      border-left: 4px solid var(--color-success);
+    }
+    .callout-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .callout-content { flex: 1; }
+    .callout-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: var(--text-base);
+      margin-bottom: var(--space-1);
+    }
+    .callout-content p {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      margin: 0;
+    }
+
+    /* ===========================================
+       COMPARISON TABLE
+       =========================================== */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--space-6) 0;
+      font-size: var(--text-sm);
+      background: var(--color-surface);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .compare-table th {
+      font-family: var(--font-display);
+      font-weight: 600;
+      text-align: left;
+      padding: var(--space-4);
+      background: var(--color-bg-warm);
+      border-bottom: 2px solid var(--color-border);
+      font-size: var(--text-sm);
+    }
+    .compare-table th:first-child { width: 140px; }
+    .compare-table td {
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--color-border-light);
+      vertical-align: top;
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table .check { color: var(--color-success); font-weight: 700; }
+    .compare-table .cross { color: var(--color-error); opacity: 0.5; }
+    .compare-table .highlight-col {
+      background: var(--color-accent-light);
+      border-left: 2px solid var(--color-accent);
+    }
+    .compare-table .label-row td {
+      font-family: var(--font-display);
+      font-weight: 600;
+      background: var(--color-bg);
+      padding-top: var(--space-4);
+    }
+
+    /* ===========================================
+       MIND MAP / ARCHITECTURE
+       =========================================== */
+    .mindmap {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-8);
+      margin: var(--space-6) 0;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+    .mindmap-center {
+      display: flex; flex-direction: column; align-items: center;
+      position: relative; z-index: 2;
+    }
+    .mindmap-core {
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
+      color: white;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: var(--text-lg);
+      box-shadow: 0 8px 32px rgba(42,123,155,0.25);
+      position: relative;
+      z-index: 3;
+    }
+    .mindmap-core .emoji { font-size: 1.8rem; margin-bottom: 2px; }
+    .mindmap-branches {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+      margin-top: var(--space-6);
+    }
+    .mindmap-branch {
+      text-align: center;
+      padding: var(--space-4);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-border-light);
+      background: var(--color-surface-warm);
+      transition: transform var(--duration-fast), box-shadow var(--duration-fast);
+    }
+    .mindmap-branch:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+    .mindmap-branch-icon {
+      font-size: 1.5rem;
+      margin-bottom: var(--space-2);
+    }
+    .mindmap-branch-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: var(--text-sm);
+      margin-bottom: var(--space-1);
+    }
+    .mindmap-branch-desc {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+    }
+    .mindmap-connector {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 200px; height: 200px;
+      border: 2px dashed var(--color-border);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      animation: pulse-ring 3s infinite;
+    }
+    @keyframes pulse-ring {
+      0%, 100% { opacity: 0.2; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 0.4; transform: translate(-50%, -50%) scale(1.05); }
+    }
+
+    @media (max-width: 600px) {
+      .mindmap-branches { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ===========================================
+       CODE BLOCK (Quick Start)
+       =========================================== */
+    .code-block {
+      background: var(--color-bg-code);
+      color: #CDD6F4;
+      border-radius: var(--radius-md);
+      padding: var(--space-6);
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      line-height: 1.8;
+      margin: var(--space-4) 0;
+      position: relative;
+      overflow-x: hidden;
+      box-shadow: var(--shadow-md);
+    }
+    .code-block .comment { color: #6C7086; font-style: italic; }
+    .code-block .cmd { color: #89B4FA; }
+    .code-block .flag { color: #CBA6F7; }
+    .code-block .str { color: #A6E3A1; }
+    .code-block .label {
+      position: absolute; top: var(--space-2); right: var(--space-3);
+      font-size: var(--text-xs); text-transform: uppercase;
+      letter-spacing: 0.1em; opacity: 0.4;
+    }
+    .code-annotation {
+      color: var(--color-info);
+      font-family: var(--font-body);
+      font-size: var(--text-xs);
+      margin-left: 1em;
+      font-style: italic;
+    }
+
+    /* ===========================================
+       USE CASE CARDS
+       =========================================== */
+    .use-cases {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+      margin: var(--space-6) 0;
+    }
+    .use-case-card {
+      display: flex; gap: var(--space-5);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-sm);
+      transition: transform var(--duration-fast), box-shadow var(--duration-fast);
+    }
+    .use-case-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .use-case-emoji {
+      font-size: 2rem;
+      flex-shrink: 0;
+      width: 56px; height: 56px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .use-case-body { flex: 1; }
+    .use-case-role {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-accent);
+      margin-bottom: var(--space-1);
+    }
+    .use-case-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: var(--text-lg);
+      margin-bottom: var(--space-2);
+    }
+    .use-case-desc {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: var(--leading-normal);
+    }
+    .use-case-desc strong { color: var(--color-text); }
+    .use-case-quote {
+      margin-top: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-accent-light);
+      border-radius: var(--radius-sm);
+      font-size: var(--text-sm);
+      font-style: italic;
+      color: var(--color-accent-hover);
+    }
+    .use-case-source {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: var(--space-2);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      font-style: normal;
+    }
+    .use-case-source a {
+      color: var(--color-text-muted);
+      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 6px;
+      transition: color var(--duration-fast);
+    }
+    .use-case-source a:hover {
+      color: var(--color-accent);
+    }
+    .use-case-source .source-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+    .source-badge.github   { background: #24292f; }
+    .source-badge.x        { background: #0f1419; }
+    .source-badge.blog     { background: #e8590c; }
+    .source-badge.dev      { background: #3b49df; }
+    .source-badge.community { background: var(--color-accent); }
+    .use-cases-group-label {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: var(--text-xl);
+      color: var(--color-text);
+      margin-top: var(--space-8);
+      margin-bottom: var(--space-3);
+      padding-bottom: var(--space-2);
+      border-bottom: 2px solid var(--color-border);
+      display: flex; align-items: center; gap: var(--space-2);
+    }
+    .use-cases-group-label .label-icon {
+      font-size: 1.2em;
+    }
+
+    @media (max-width: 600px) {
+      .use-case-card { flex-direction: column; }
+    }
+
+    /* ===========================================
+       STEP CARDS (Quick Start)
+       =========================================== */
+    .step-cards {
+      display: flex; flex-direction: column;
+      gap: var(--space-4);
+      margin: var(--space-6) 0;
+    }
+    .step-card {
+      display: flex; gap: var(--space-4);
+      align-items: flex-start;
+    }
+    .step-num {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--color-accent);
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: var(--text-lg);
+      flex-shrink: 0;
+    }
+    .step-body { flex: 1; }
+    .step-body strong {
+      font-family: var(--font-display);
+      font-weight: 600;
+      display: block;
+      margin-bottom: var(--space-1);
+    }
+    .step-body p {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      margin: 0;
+    }
+
+    /* ===========================================
+       GLOSSARY TOOLTIPS
+       =========================================== */
+    .term {
+      border-bottom: 1.5px dashed var(--color-accent-muted);
+      cursor: help;
+      position: relative;
+    }
+    .term:hover::after {
+      content: attr(data-def);
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-text);
+      color: white;
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-sm);
+      font-size: var(--text-xs);
+      font-family: var(--font-body);
+      font-style: normal;
+      white-space: normal;
+      width: max-content;
+      max-width: 260px;
+      z-index: 100;
+      box-shadow: var(--shadow-lg);
+      line-height: 1.4;
+    }
+
+    /* ===========================================
+       QUIZ
+       =========================================== */
+    .quiz {
+      background: var(--color-surface);
+      border: 2px solid var(--color-accent);
+      border-radius: var(--radius-md);
+      padding: var(--space-6);
+      margin: var(--space-8) 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .quiz-header {
+      display: flex; align-items: center; gap: var(--space-3);
+      margin-bottom: var(--space-5);
+    }
+    .quiz-icon {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--color-accent);
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .quiz-label {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: var(--text-lg);
+      color: var(--color-accent);
+    }
+    .quiz-question {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: var(--text-base);
+      margin-bottom: var(--space-4);
+      line-height: var(--leading-snug);
+    }
+    .quiz-options {
+      display: flex; flex-direction: column;
+      gap: var(--space-2);
+    }
+    .quiz-option {
+      display: flex; align-items: center; gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      transition: all var(--duration-fast);
+      background: var(--color-surface);
+      font-family: var(--font-body);
+      width: 100%;
+      text-align: left;
+    }
+    .quiz-option:hover {
+      border-color: var(--color-accent-muted);
+      background: var(--color-accent-light);
+      color: var(--color-text);
+    }
+    .quiz-option.correct {
+      border-color: var(--color-success);
+      background: var(--color-success-light);
+      color: var(--color-success);
+      font-weight: 600;
+    }
+    .quiz-option.wrong {
+      border-color: var(--color-error);
+      background: var(--color-error-light);
+      color: var(--color-error);
+      opacity: 0.7;
+    }
+    .quiz-option.disabled {
+      pointer-events: none;
+    }
+    .quiz-option-letter {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      border: 1.5px solid var(--color-border);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      flex-shrink: 0;
+      transition: all var(--duration-fast);
+    }
+    .quiz-option.correct .quiz-option-letter {
+      background: var(--color-success);
+      color: white;
+      border-color: var(--color-success);
+    }
+    .quiz-option.wrong .quiz-option-letter {
+      background: var(--color-error);
+      color: white;
+      border-color: var(--color-error);
+    }
+    .quiz-explain {
+      display: none;
+      margin-top: var(--space-4);
+      padding: var(--space-4);
+      background: var(--color-success-light);
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--color-success);
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: var(--leading-normal);
+    }
+    .quiz-explain.show { display: block; }
+    .quiz-explain strong { color: var(--color-success); }
+
+    /* ===========================================
+       DATA JOURNEY (Vertical Flow)
+       =========================================== */
+    .journey {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-6);
+      margin: var(--space-6) 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .journey-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: var(--text-lg);
+      text-align: center;
+      margin-bottom: var(--space-6);
+      color: var(--color-accent);
+    }
+    .journey-steps {
+      display: flex; flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+    .journey-step {
+      display: flex; align-items: center; gap: var(--space-4);
+      width: 100%;
+      max-width: 500px;
+    }
+    .journey-step-icon {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      border: 2px solid var(--color-border);
+      background: var(--color-surface);
+      transition: all var(--duration-normal) var(--ease-out);
+    }
+    .journey-step.active .journey-step-icon {
+      border-color: var(--color-accent);
+      background: var(--color-accent-light);
+      box-shadow: 0 0 0 4px rgba(42,123,155,0.12);
+      transform: scale(1.1);
+    }
+    .journey-step-text {
+      flex: 1;
+    }
+    .journey-step-label {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: var(--text-sm);
+      margin-bottom: 2px;
+    }
+    .journey-step-desc {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      line-height: 1.4;
+    }
+    .journey-arrow {
+      display: flex; justify-content: center;
+      padding: var(--space-1) 0;
+      color: var(--color-border);
+      font-size: 1.2rem;
+    }
+    .journey-arrow.active { color: var(--color-accent); }
+
+    /* ===========================================
+       DECISION FLOW
+       =========================================== */
+    .decision-flow {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-6);
+      margin: var(--space-6) 0;
+      box-shadow: var(--shadow-sm);
+      text-align: center;
+    }
+    .decision-flow-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: var(--text-lg);
+      margin-bottom: var(--space-5);
+      color: var(--color-accent);
+    }
+    .decision-node {
+      display: inline-block;
+      padding: var(--space-3) var(--space-5);
+      border-radius: var(--radius-sm);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      font-family: var(--font-display);
+      margin: var(--space-1) 0;
+    }
+    .decision-q {
+      background: var(--color-info-light);
+      border: 2px solid var(--color-info);
+      color: var(--color-text);
+      border-radius: 999px;
+    }
+    .decision-a {
+      background: var(--color-success-light);
+      border: 1.5px solid var(--color-success);
+      color: var(--color-success);
+    }
+    .decision-branches {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+      margin-top: var(--space-3);
+      text-align: center;
+    }
+    .decision-branch {
+      display: flex; flex-direction: column;
+      align-items: center; gap: var(--space-2);
+    }
+    .decision-branch-label {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .decision-arrow-down {
+      color: var(--color-text-muted);
+      font-size: 1rem;
+    }
+    @media (max-width: 480px) {
+      .decision-branches { grid-template-columns: 1fr; }
+    }
+
+    /* ===========================================
+       FOOTER
+       =========================================== */
+    .footer {
+      text-align: center;
+      padding: var(--space-10) var(--space-6);
+      background: var(--color-bg-warm);
+      border-top: 1px solid var(--color-border-light);
+    }
+    .footer p {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+    }
+    .footer a {
+      color: var(--color-accent);
+      text-decoration: none;
+    }
+    .footer a:hover { text-decoration: underline; }
+
+    /* ===========================================
+       RESPONSIVE
+       =========================================== */
+    @media (max-width: 768px) {
+      :root {
+        --text-4xl: 1.875rem;
+        --text-5xl: 2.25rem;
+        --text-6xl: 3rem;
+      }
+    }
+    @media (max-width: 480px) {
+      :root {
+        --text-4xl: 1.5rem;
+        --text-5xl: 1.875rem;
+        --text-6xl: 2.25rem;
+      }
+      .module { padding: var(--space-8) var(--space-4); padding-top: calc(var(--nav-height) + var(--space-8)); }
+      .flow-actors { flex-wrap: wrap; justify-content: center; gap: var(--space-3); }
+      .hero-stats { flex-direction: column; gap: var(--space-4); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       NAVIGATION
+       ============================================================ -->
+  <nav class="nav" id="nav">
+    <div class="progress-bar" id="progress-bar"></div>
+    <div class="nav-inner">
+      <span class="nav-title">GBrain 小白指南</span>
+      <div class="nav-dots" id="nav-dots">
+        <button class="nav-dot active" data-target="hero" data-tooltip="开始"></button>
+        <button class="nav-dot" data-target="module-1" data-tooltip="为什么需要"></button>
+        <button class="nav-dot" data-target="module-2" data-tooltip="怎么工作"></button>
+        <button class="nav-dot" data-target="module-3" data-tooltip="全景图"></button>
+        <button class="nav-dot" data-target="module-4" data-tooltip="对比"></button>
+        <button class="nav-dot" data-target="module-5" data-tooltip="真实案例"></button>
+        <button class="nav-dot" data-target="module-6" data-tooltip="快速上手"></button>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+
+  <!-- ============================================================
+       HERO
+       ============================================================ -->
+  <section class="hero" id="hero">
+    <div class="hero-badge animate-in">garrytan/gbrain &middot; MIT License</div>
+    <h1 class="animate-in">给 AI 装一个<br><span class="highlight">长期记忆</span></h1>
+    <p class="hero-desc animate-in">GBrain 是一个开源的 AI 知识库系统。<br>让 AI 记住你的邮件、日历、笔记、对话，越用越懂你。</p>
+    <div class="hero-stats animate-in">
+      <div class="hero-stat">
+        <div class="hero-stat-num">7,000+</div>
+        <div class="hero-stat-label">GitHub Stars</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">750+</div>
+        <div class="hero-stat-label">Forks</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">30+</div>
+        <div class="hero-stat-label">MCP 工具</div>
+      </div>
+    </div>
+    <div class="hero-scroll-hint">向下滚动 ↓</div>
+  </section>
+
+
+  <!-- ============================================================
+       MODULE 1 — 为什么 AI 需要"记忆"？
+       ============================================================ -->
+  <section class="module" id="module-1" style="background: var(--color-bg-warm)">
+    <div class="module-content">
+      <header class="module-header animate-in">
+        <span class="module-number">01</span>
+        <h2 class="module-title">为什么 AI 需要"记忆"？</h2>
+        <p class="module-subtitle">你有没有发现，每次跟 AI 新对话，它都不记得你之前说了什么？</p>
+      </header>
+
+      <!-- Screen 1: The Problem -->
+      <div class="screen animate-in">
+        <h3 class="screen-heading">每天都失忆的超级助理</h3>
+        <p>想象你雇了一个超厉害的助理 — 他什么都会，但有个致命缺陷：<strong>每天上班都失忆</strong>。</p>
+        <p>你昨天跟他说了半天的项目背景，今天他全忘了。你每次都要从头解释。很崩溃对吧？</p>
+        <p><strong>这就是现在 AI 的状态。</strong></p>
+
+        <div class="chat-window animate-in" id="chat-problem">
+          <div class="chat-header">对话模拟：AI 的日常</div>
+          <div class="chat-messages" id="chat-problem-messages"></div>
+          <div class="chat-typing" id="chat-problem-typing" style="display:none">
+            <div class="chat-avatar" style="background: var(--color-actor-1)">AI</div>
+            <div class="typing-dots"><span></span><span></span><span></span></div>
+          </div>
+          <div class="chat-controls">
+            <button class="btn btn-primary chat-next-btn" data-chat="chat-problem">下一条</button>
+            <button class="btn chat-all-btn" data-chat="chat-problem">全部播放</button>
+            <button class="btn chat-reset-btn" data-chat="chat-problem">重播</button>
+            <span class="chat-progress" id="chat-problem-progress"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 2: What GBrain does -->
+      <div class="screen animate-in">
+        <h3 class="screen-heading">GBrain 做了什么？</h3>
+        <p>GBrain 就是给你的 AI 助理配了一本<strong>「你的人生百科全书」</strong>。它把你的各种信息汇总到一个智能数据库里，AI 随时能翻阅、搜索、更新。</p>
+
+        <div class="pattern-cards stagger-children">
+          <div class="pattern-card animate-in">
+            <div class="pattern-icon" style="background: var(--color-accent-light); color: var(--color-accent);">📧</div>
+            <div class="pattern-title">邮件和日历</div>
+            <p class="pattern-desc">自动导入 Gmail、Google Calendar，AI 知道你什么时候有会，跟谁聊了什么。</p>
+          </div>
+          <div class="pattern-card animate-in">
+            <div class="pattern-icon" style="background: var(--color-info-light); color: var(--color-info);">📝</div>
+            <div class="pattern-title">笔记和想法</div>
+            <p class="pattern-desc">从 Obsidian、Notion、Logseq 导入笔记，AI 能直接利用你积累的知识。</p>
+          </div>
+          <div class="pattern-card animate-in">
+            <div class="pattern-icon" style="background: var(--color-success-light); color: var(--color-success);">🔄</div>
+            <div class="pattern-title">越用越聪明</div>
+            <p class="pattern-desc">每次和 AI 对话都会丰富知识库。用得越多，AI 对你的理解就越深。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-accent animate-in">
+        <span class="callout-icon">💡</span>
+        <div class="callout-content">
+          <span class="callout-title">核心理念</span>
+          <p>GBrain 的口号是："<strong>Repo 是事实来源，GBrain 是检索层，Agent 通过两者读写。人类永远优先 — 你可以直接编辑任何 Markdown 文件。</strong>"</p>
+        </div>
+      </div>
+
+      <!-- Quiz 1 -->
+      <div class="quiz animate-in" id="quiz-1">
+        <div class="quiz-header">
+          <div class="quiz-icon">?</div>
+          <span class="quiz-label">检查一下你的理解</span>
+        </div>
+        <div class="quiz-question">现在的 AI（比如 ChatGPT、Claude）最大的"记忆"问题是什么？</div>
+        <div class="quiz-options" data-quiz="quiz-1" data-answer="1">
+          <button class="quiz-option" data-idx="0">
+            <span class="quiz-option-letter">A</span>
+            AI 回答的不够准确
+          </button>
+          <button class="quiz-option" data-idx="1">
+            <span class="quiz-option-letter">B</span>
+            每次新对话都从零开始，不记得你之前说了什么
+          </button>
+          <button class="quiz-option" data-idx="2">
+            <span class="quiz-option-letter">C</span>
+            AI 只能用英文交流
+          </button>
+          <button class="quiz-option" data-idx="3">
+            <span class="quiz-option-letter">D</span>
+            AI 的运行速度太慢
+          </button>
+        </div>
+        <div class="quiz-explain" id="quiz-1-explain">
+          <strong>正确！</strong> 目前 AI 的最大痛点就是"失忆"— 每次对话都是全新的，它不知道你是谁、之前聊过什么。GBrain 就是为了解决这个问题而诞生的：给 AI 配一个外部知识库，让它能记住你的一切。
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       MODULE 2 — GBrain 怎么工作？
+       ============================================================ -->
+  <section class="module" id="module-2" style="background: var(--color-bg)">
+    <div class="module-content">
+      <header class="module-header animate-in">
+        <span class="module-number">02</span>
+        <h2 class="module-title">GBrain 怎么工作？</h2>
+        <p class="module-subtitle">读-写循环：AI 越用越懂你的秘密</p>
+      </header>
+
+      <!-- Screen 1: The Read-Write Loop -->
+      <div class="screen animate-in">
+        <h3 class="screen-heading">读-写循环</h3>
+        <p>GBrain 的工作方式很简单 — 就像一个不断学习的助理：<strong>先查资料，再回答你，然后把新学到的记下来</strong>。</p>
+
+        <div class="flow-animation animate-in" id="flow-rw">
+          <div class="flow-actors">
+            <div class="flow-actor" id="flow-rw-signal">
+              <div class="flow-actor-icon" style="background: var(--color-accent-light); border-color: var(--color-actor-1);">📨</div>
+              <span>信号到达</span>
+            </div>
+            <div class="flow-actor" id="flow-rw-read">
+              <div class="flow-actor-icon" style="background: var(--color-info-light); border-color: var(--color-actor-4);">🔍</div>
+              <span>读取记忆</span>
+            </div>
+            <div class="flow-actor" id="flow-rw-respond">
+              <div class="flow-actor-icon" style="background: #EDE8F5; border-color: var(--color-actor-3);">💬</div>
+              <span>智能回复</span>
+            </div>
+            <div class="flow-actor" id="flow-rw-write">
+              <div class="flow-actor-icon" style="background: var(--color-success-light); border-color: var(--color-actor-5);">✍️</div>
+              <span>写入新知识</span>
+            </div>
+            <div class="flow-actor" id="flow-rw-index">
+              <div class="flow-actor-icon" style="background: #FDE2D2; border-color: var(--color-actor-2);">📇</div>
+              <span>索引入库</span>
+            </div>
+          </div>
+          <div class="flow-step-label-box" id="flow-rw-label">点击「下一步」开始</div>
+          <div class="flow-controls">
+            <button class="btn flow-next-btn" data-flow="flow-rw">下一步</button>
+            <button class="btn flow-reset-btn" data-flow="flow-rw">重新开始</button>
+            <span class="flow-progress" id="flow-rw-progress"></span>
+          </div>
+        </div>
+
+        <div class="callout callout-info animate-in">
+          <span class="callout-icon">🔑</span>
+          <div class="callout-content">
+            <span class="callout-title">关键：知识是复利增长的</span>
+            <p>用了几周之后，系统会自动维护知识之间的连接，提供越来越丰富的上下文。就像滚雪球一样。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 2: Data Journey -->
+      <div class="screen animate-in">
+        <h3 class="screen-heading">你的数据旅程：从笔记到智能回答</h3>
+        <p>当你问 AI 一个问题时，数据在 GBrain 里走了这样一趟旅程：</p>
+
+        <div class="journey animate-in" id="journey-data">
+          <div class="journey-title">一个问题的完整旅程</div>
+          <div class="journey-steps">
+            <div class="journey-step active" id="j-step-1">
+              <div class="journey-step-icon" style="border-color: var(--color-actor-1); background: var(--color-accent-light);">💬</div>
+              <div class="journey-step-text">
+                <div class="journey-step-label">你提了个问题</div>
+                <div class="journey-step-desc">比如："上次和李总聊了什么？"</div>
+              </div>
+            </div>
+            <div class="journey-arrow active">↓</div>
+            <div class="journey-step active" id="j-step-2">
+              <div class="journey-step-icon" style="border-color: var(--color-info); background: var(--color-info-light);">🔍</div>
+              <div class="journey-step-text">
+                <div class="journey-step-label">AI 去知识库里找线索</div>
+                <div class="journey-step-desc">同时用"关键词匹配"和"语义理解"两种方式搜索</div>
+              </div>
+            </div>
+            <div class="journey-arrow active">↓</div>
+            <div class="journey-step active" id="j-step-3">
+              <div class="journey-step-icon" style="border-color: var(--color-actor-3); background: #EDE8F5;">📋</div>
+              <div class="journey-step-text">
+                <div class="journey-step-label">找到相关内容并排序</div>
+                <div class="journey-step-desc">可能找到：一封邮件、两条会议记录、一个待办事项</div>
+              </div>
+            </div>
+            <div class="journey-arrow active">↓</div>
+            <div class="journey-step active" id="j-step-4">
+              <div class="journey-step-icon" style="border-color: var(--color-success); background: var(--color-success-light);">💡</div>
+              <div class="journey-step-text">
+                <div class="journey-step-label">AI 综合这些信息回答你</div>
+                <div class="journey-step-desc">"上周四你和李总讨论了 Q3 预算，他倾向方案 B，你承诺周五前给修改版"</div>
+              </div>
+            </div>
+            <div class="journey-arrow active">↓</div>
+            <div class="journey-step active" id="j-step-5">
+              <div class="journey-step-icon" style="border-color: var(--color-actor-2); background: #FDE2D2;">✍️</div>
+              <div class="journey-step-text">
+                <div class="journey-step-label">新信息被记录下来</div>
+                <div class="journey-step-desc">这次对话的内容也变成知识库的一部分，下次可以被搜到</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 3: The Search -->
+      <div class="screen animate-in">
+        <h3 class="screen-heading">智能搜索：不只是关键词匹配</h3>
+        <p>普通的搜索引擎只能做关键词匹配 — 你搜"开会"，它只找包含"开会"两个字的文档。</p>
+        <p>GBrain 用的是<strong><span class="term" data-def="混合搜索：同时使用两种搜索方式。第一种是传统的关键词匹配（像 Ctrl+F），第二种是语义搜索（理解你话的意思去找相关内容）。两种结果合在一起，准确率更高。">混合搜索</span></strong> — 它能理解"意思"。搜"上次跟客户聊了什么"，即使你的笔记里没有"客户"这个词，它也能找到相关内容。</p>
+
+        <div class="pattern-cards stagger-children" style="grid-template-columns: 1fr 1fr;">
+          <div class="pattern-card animate-in">
+            <div class="pattern-icon" style="background: var(--color-error-light); color: var(--color-error);">🔤</div>
+            <div class="pattern-title">普通搜索</div>
+            <p class="pattern-desc">像 Ctrl+F 一样，只能找到完全匹配的关键词。搜"苹果"就只找"苹果"，不会找到"iPhone"。</p>
+          </div>
+          <div class="pattern-card animate-in" style="border: 2px solid var(--color-accent);">
+            <div class="pattern-icon" style="background: var(--color-accent-light); color: var(--color-accent);">🧠</div>
+            <div class="pattern-title">GBrain 智能搜索</div>
+            <p class="pattern-desc"><strong>关键词 + 理解意思</strong>，双重匹配。搜"苹果"能同时找到水果和苹果公司的内容，还能根据你的上下文判断你想找哪个。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quiz 2 -->
+      <div class="quiz animate-in" id="quiz-2">
+        <div class="quiz-header">
+          <div class="quiz-icon">?</div>
+          <span class="quiz-label">检查一下你的理解</span>
+        </div>
+        <div class="quiz-question">GBrain 的"读写循环"和普通 RAG 检索最大的区别是什么？</div>
+        <div class="quiz-options" data-quiz="quiz-2" data-answer="2">
+          <button class="quiz-option" data-idx="0">
+            <span class="quiz-option-letter">A</span>
+            GBrain 的搜索速度更快
+          </button>
+          <button class="quiz-option" data-idx="1">
+            <span class="quiz-option-letter">B</span>
+            GBrain 只能搜索英文内容
+          </button>
+          <button class="quiz-option" data-idx="2">
+            <span class="quiz-option-letter">C</span>
+            AI 不仅能读取知识，还能把新学到的东西写回去，知识越用越多
+          </button>
+          <button class="quiz-option" data-idx="3">
+            <span class="quiz-option-letter">D</span>
+            GBrain 必须联网才能使用
+          </button>
+        </div>
+        <div class="quiz-explain" id="quiz-2-explain">
+          <strong>正确！</strong> 普通的 RAG 只能"读"— AI 从文档库里找信息，但不会把新信息写回去。GBrain 的核心创新是"读写循环"：每次对话都会让知识库变得更丰富。就像一个越用越聪明的笔记本。
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       MODULE 3 — 全景图
+       ============================================================ -->
+  <section class="module" id="module-3" style="background: var(--color-bg-warm)">
+    <div class="module-content">
+      <header class="module-header animate-in">
+        <span class="module-number">03</span>
+        <h2 class="module-title">GBrain 全景图</h2>
+        <p class="module-subtitle">六大功能模块，一张图看懂整个系统</p>
+      </header>
+
+      <div class="screen animate-in">
+        <div class="mindmap">
+          <div class="mindmap-center">
+            <div class="mindmap-connector"></div>
+            <div class="mindmap-core">
+              <span class="emoji">🧠</span>
+              GBrain
+            </div>
+          </div>
+          <div class="mindmap-branches stagger-children">
+            <div class="mindmap-branch animate-in">
+              <div class="mindmap-branch-icon">💾</div>
+              <div class="mindmap-branch-title">本地数据库</div>
+              <div class="mindmap-branch-desc"><strong>你的电脑就是服务器</strong><br>数据库直接装在你电脑上，不用联网，不用注册账号，打开就能用</div>
+            </div>
+            <div class="mindmap-branch animate-in">
+              <div class="mindmap-branch-icon">🔍</div>
+              <div class="mindmap-branch-title">智能搜索</div>
+              <div class="mindmap-branch-desc"><strong>像人一样理解你的意思</strong><br>搜"上次聊的项目"，不需要记得具体名字，AI 能理解你说的是什么</div>
+            </div>
+            <div class="mindmap-branch animate-in">
+              <div class="mindmap-branch-icon">📧</div>
+              <div class="mindmap-branch-title">自动导入数据</div>
+              <div class="mindmap-branch-desc"><strong>连接你已有的信息源</strong><br>Gmail 邮件、日历日程、Twitter 等，自动同步到知识库，不用手动整理</div>
+            </div>
+            <div class="mindmap-branch animate-in">
+              <div class="mindmap-branch-icon">🔌</div>
+              <div class="mindmap-branch-title">接入 AI 工具</div>
+              <div class="mindmap-branch-desc"><strong>让 Claude、Cursor 直接用</strong><br>通过一种叫 <span class="term" data-def="MCP (Model Context Protocol)：一种标准接口协议。就像 USB 让不同设备能互相连接，MCP 让不同 AI 工具能连接你的知识库。">MCP</span> 的标准接口，AI 工具可以直接读写你的知识库</div>
+            </div>
+            <div class="mindmap-branch animate-in">
+              <div class="mindmap-branch-icon">📁</div>
+              <div class="mindmap-branch-title">普通文本存储</div>
+              <div class="mindmap-branch-desc"><strong>用记事本就能打开</strong><br>所有数据都是 .md 文件（类似 .txt），你可以直接打开看、直接改，没有黑箱</div>
+            </div>
+            <div class="mindmap-branch animate-in">
+              <div class="mindmap-branch-icon">☁️</div>
+              <div class="mindmap-branch-title">灵活部署</div>
+              <div class="mindmap-branch-desc"><strong>从个人到团队都能用</strong><br>一个人用？装在自己电脑上。团队用？可以放到云服务器上，按需扩展</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout callout-success animate-in">
+          <span class="callout-icon">✅</span>
+          <div class="callout-content">
+            <span class="callout-title">数据始终在你手中</span>
+            <p>GBrain 默认把所有数据存在你自己的电脑上（Markdown 文件 + 本地数据库）。你随时可以打开文件夹直接编辑，不依赖任何第三方服务。</p>
+          </div>
+        </div>
+
+        <!-- Quiz 3 -->
+        <div class="quiz animate-in" id="quiz-3">
+          <div class="quiz-header">
+            <div class="quiz-icon">?</div>
+            <span class="quiz-label">检查一下你的理解</span>
+          </div>
+          <div class="quiz-question">GBrain 把你的笔记和数据存在哪里？</div>
+          <div class="quiz-options" data-quiz="quiz-3" data-answer="0">
+            <button class="quiz-option" data-idx="0">
+              <span class="quiz-option-letter">A</span>
+              存在你自己电脑上的普通文本文件里，你可以随时打开看
+            </button>
+            <button class="quiz-option" data-idx="1">
+              <span class="quiz-option-letter">B</span>
+              上传到 GBrain 公司的云服务器
+            </button>
+            <button class="quiz-option" data-idx="2">
+              <span class="quiz-option-letter">C</span>
+              存在 OpenAI 的数据库里
+            </button>
+            <button class="quiz-option" data-idx="3">
+              <span class="quiz-option-letter">D</span>
+              加密后存在区块链上
+            </button>
+          </div>
+          <div class="quiz-explain" id="quiz-3-explain">
+            <strong>正确！</strong> GBrain 所有数据默认都存在你电脑上的 Markdown 文件（.md 格式，类似 .txt 纯文本）里。你可以用任何文本编辑器打开查看和修改。这意味着：即使 GBrain 项目停止维护了，你的数据依然完好无损。
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       MODULE 4 — 对比：它和其他工具有什么不同？
+       ============================================================ -->
+  <section class="module" id="module-4" style="background: var(--color-bg)">
+    <div class="module-content">
+      <header class="module-header animate-in">
+        <span class="module-number">04</span>
+        <h2 class="module-title">跟其他工具有什么不同？</h2>
+        <p class="module-subtitle">市面上也有类似的"AI 记忆"方案，但设计思路各不相同</p>
+      </header>
+
+      <div class="screen animate-in">
+        <h3 class="screen-heading">解决的核心问题</h3>
+        <p>"AI 没有长期记忆"这个问题，目前有三种主流解决思路：</p>
+
+        <div class="pattern-cards stagger-children">
+          <div class="pattern-card animate-in">
+            <div class="pattern-icon" style="background: #FDE8E8; color: var(--color-error);">🪣</div>
+            <div class="pattern-title">思路 A：塞更多上下文</div>
+            <p class="pattern-desc">每次对话都把相关文件全部塞进去。简单粗暴，但上下文窗口有限，塞不下太多。</p>
+          </div>
+          <div class="pattern-card animate-in">
+            <div class="pattern-icon" style="background: var(--color-info-light); color: var(--color-info);">🗂️</div>
+            <div class="pattern-title">思路 B：RAG 检索</div>
+            <p class="pattern-desc">建一个文档库，AI 需要时去搜索。但大多只能读、不能写，知识无法自动增长。</p>
+          </div>
+          <div class="pattern-card animate-in" style="border: 2px solid var(--color-accent);">
+            <div class="pattern-icon" style="background: var(--color-accent-light); color: var(--color-accent);">🧠</div>
+            <div class="pattern-title">思路 C：GBrain 的方式</div>
+            <p class="pattern-desc"><strong>读写循环的知识库</strong>。AI 不仅能搜索，还能主动记录和整理。知识像存款一样复利增长。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen animate-in">
+        <h3 class="screen-heading">详细对比</h3>
+
+        <table class="compare-table animate-in">
+          <thead>
+            <tr>
+              <th>特性</th>
+              <th class="highlight-col"><a href="https://github.com/garrytan/gbrain" target="_blank" rel="noopener" style="color: inherit; text-decoration: none; border-bottom: 1.5px dashed var(--color-accent);">GBrain ↗</a></th>
+              <th><a href="https://github.com/mem0ai/mem0" target="_blank" rel="noopener" style="color: inherit; text-decoration: none; border-bottom: 1.5px dashed var(--color-text-muted);">Mem0 ↗</a></th>
+              <th>Claude Memory</th>
+              <th><a href="https://github.com/obsidianmd/obsidian-releases" target="_blank" rel="noopener" style="color: inherit; text-decoration: none; border-bottom: 1.5px dashed var(--color-text-muted);">Obsidian ↗</a> + RAG</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="label-row"><td colspan="5">基础能力</td></tr>
+            <tr>
+              <td>开源免费</td>
+              <td class="highlight-col"><span class="check">&#10003;</span> MIT</td>
+              <td><span class="check">&#10003;</span> 部分</td>
+              <td><span class="cross">&#10007;</span> 闭源</td>
+              <td><span class="check">&#10003;</span></td>
+            </tr>
+            <tr>
+              <td>数据在本地</td>
+              <td class="highlight-col"><span class="check">&#10003;</span> 默认本地</td>
+              <td><span class="cross">&#10007;</span> 云端</td>
+              <td><span class="cross">&#10007;</span> Anthropic 服务器</td>
+              <td><span class="check">&#10003;</span></td>
+            </tr>
+            <tr>
+              <td>AI 可写入</td>
+              <td class="highlight-col"><span class="check">&#10003;</span> 完整读写</td>
+              <td><span class="check">&#10003;</span></td>
+              <td><span class="check">&#10003;</span> 有限</td>
+              <td><span class="cross">&#10007;</span> 只读</td>
+            </tr>
+            <tr class="label-row"><td colspan="5">集成能力</td></tr>
+            <tr>
+              <td>邮件/日历</td>
+              <td class="highlight-col"><span class="check">&#10003;</span> Gmail/GCal</td>
+              <td><span class="cross">&#10007;</span></td>
+              <td><span class="cross">&#10007;</span></td>
+              <td>需要插件</td>
+            </tr>
+            <tr>
+              <td>MCP 协议</td>
+              <td class="highlight-col"><span class="check">&#10003;</span> 30+ 工具</td>
+              <td><span class="check">&#10003;</span></td>
+              <td>内置</td>
+              <td>需要配置</td>
+            </tr>
+            <tr>
+              <td>语音通话</td>
+              <td class="highlight-col"><span class="check">&#10003;</span> Twilio</td>
+              <td><span class="cross">&#10007;</span></td>
+              <td><span class="cross">&#10007;</span></td>
+              <td><span class="cross">&#10007;</span></td>
+            </tr>
+            <tr class="label-row"><td colspan="5">适合谁</td></tr>
+            <tr>
+              <td>目标用户</td>
+              <td class="highlight-col">开发者 / AI Agent</td>
+              <td>开发者 / 企业</td>
+              <td>所有 Claude 用户</td>
+              <td>笔记爱好者</td>
+            </tr>
+            <tr>
+              <td>上手难度</td>
+              <td class="highlight-col">中等（需命令行）</td>
+              <td>较难（需部署）</td>
+              <td>零门槛</td>
+              <td>简单</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="decision-flow animate-in">
+          <div class="decision-flow-title">不知道选哪个？跟着这个流程走</div>
+
+          <!-- Level 1 -->
+          <div class="decision-node decision-q">你会用命令行（终端）吗？</div>
+          <div class="decision-branches">
+            <div class="decision-branch">
+              <div class="decision-branch-label">不会 / 不想折腾</div>
+              <div class="decision-arrow-down">↓</div>
+              <div class="decision-node decision-q" style="font-size: var(--text-xs);">你喜欢记笔记吗？</div>
+              <div class="decision-branches" style="margin-top: var(--space-2);">
+                <div class="decision-branch">
+                  <div class="decision-branch-label" style="font-size: 0.6rem;">不记</div>
+                  <div class="decision-arrow-down">↓</div>
+                  <div class="decision-node decision-a">Claude Memory</div>
+                  <div style="font-size: var(--text-xs); color: var(--color-text-muted); margin-top: 4px;">零门槛，开箱即用</div>
+                </div>
+                <div class="decision-branch">
+                  <div class="decision-branch-label" style="font-size: 0.6rem;">喜欢</div>
+                  <div class="decision-arrow-down">↓</div>
+                  <div class="decision-node decision-a">Obsidian + RAG</div>
+                  <div style="font-size: var(--text-xs); color: var(--color-text-muted); margin-top: 4px;">先积累笔记资产</div>
+                </div>
+              </div>
+            </div>
+            <div class="decision-branch">
+              <div class="decision-branch-label">会 / 愿意学</div>
+              <div class="decision-arrow-down">↓</div>
+              <div class="decision-node decision-q" style="font-size: var(--text-xs);">你在意数据隐私吗？</div>
+              <div class="decision-branches" style="margin-top: var(--space-2);">
+                <div class="decision-branch">
+                  <div class="decision-branch-label" style="font-size: 0.6rem;">不太在意</div>
+                  <div class="decision-arrow-down">↓</div>
+                  <div class="decision-node decision-a">Mem0</div>
+                  <div style="font-size: var(--text-xs); color: var(--color-text-muted); margin-top: 4px;">云端托管，API 驱动</div>
+                </div>
+                <div class="decision-branch">
+                  <div class="decision-branch-label" style="font-size: 0.6rem;">非常在意</div>
+                  <div class="decision-arrow-down">↓</div>
+                  <div class="decision-node decision-a" style="background: var(--color-accent-light); border-color: var(--color-accent); color: var(--color-accent);">GBrain ✓</div>
+                  <div style="font-size: var(--text-xs); color: var(--color-text-muted); margin-top: 4px;">本地优先，完全掌控</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       MODULE 5 — 真实使用案例
+       ============================================================ -->
+  <section class="module" id="module-5" style="background: var(--color-bg-warm)">
+    <div class="module-content">
+      <header class="module-header animate-in">
+        <span class="module-number">05</span>
+        <h2 class="module-title">真实案例：他们怎么用</h2>
+        <p class="module-subtitle">来自 GitHub、X/Twitter、技术博客的真实用户分享</p>
+      </header>
+
+      <!-- ── 第一组：仓库官方场景 ── -->
+      <div class="use-cases-group-label animate-in"><span class="label-icon">📦</span> 仓库介绍的核心场景</div>
+
+      <div class="screen">
+        <div class="use-cases stagger-children">
+
+          <div class="use-case-card animate-in">
+            <div class="use-case-emoji" style="background: var(--color-accent-light);">👨‍💻</div>
+            <div class="use-case-body">
+              <div class="use-case-role">场景一：个人 AI 助理</div>
+              <div class="use-case-title">让 AI 记住你的一切偏好</div>
+              <p class="use-case-desc">把 Gmail 邮件、Google Calendar 日程全部导入 GBrain。跟 AI 对话时，它能<strong>自动关联上下文</strong>：说"准备下周跟 John 的会议"，AI 知道 John 是谁、上次聊了什么、合作进展如何。</p>
+              <div class="use-case-quote">"以前每次都要花 10 分钟给 AI 解释背景，现在它比我的人类助理还了解我的日程。"
+                <div class="use-case-source"><a href="https://github.com/garrytan/gbrain#readme" target="_blank" rel="noopener"><span class="source-badge github">GitHub</span> README 示例场景 ↗</a></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="use-case-card animate-in">
+            <div class="use-case-emoji" style="background: var(--color-info-light);">🤖</div>
+            <div class="use-case-body">
+              <div class="use-case-role">场景二：AI Agent 团队的大脑</div>
+              <div class="use-case-title">多个 AI Agent 共享知识库</div>
+              <p class="use-case-desc">配合 <span class="term" data-def="OpenClaw / Hermes：开源的 AI Agent 编排框架，让多个 AI Agent 协同工作。">OpenClaw/Hermes</span> 这类 AI Agent 框架使用。一个 Agent 负责读邮件，另一个写周报 — 它们<strong>共享同一个 GBrain 知识库</strong>，信息自动同步。</p>
+              <div class="use-case-quote">"Agent A 今天处理的邮件，Agent B 明天写周报时就能用上。信息终于不再是孤岛了。"
+                <div class="use-case-source"><a href="https://github.com/garrytan/gbrain#readme" target="_blank" rel="noopener"><span class="source-badge github">GitHub</span> README 示例场景 ↗</a></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="use-case-card animate-in">
+            <div class="use-case-emoji" style="background: #EDE8F5;">📞</div>
+            <div class="use-case-body">
+              <div class="use-case-role">场景三：语音界面</div>
+              <div class="use-case-title">打电话跟你的知识库对话</div>
+              <p class="use-case-desc">通过 Twilio 集成，直接<strong>打电话</strong>给 GBrain。它用 OpenAI 的实时语音模型回答问题，同时查询你的知识库。开车时想起什么灵感，直接说出来就行。</p>
+              <div class="use-case-quote">"在路上突然想到一个点子，直接打电话告诉 GBrain，到家后它已经帮我整理好了。"
+                <div class="use-case-source"><a href="https://github.com/garrytan/gbrain/releases" target="_blank" rel="noopener"><span class="source-badge github">GitHub</span> v0.8.0 功能 ↗</a></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── 第二组：作者 Garry Tan 的真实使用 ── -->
+      <div class="use-cases-group-label animate-in"><span class="label-icon">𝕏</span> 作者 Garry Tan 的真实使用（X/Twitter）</div>
+
+      <div class="screen">
+        <div class="use-cases stagger-children">
+
+          <div class="use-case-card animate-in">
+            <div class="use-case-emoji" style="background: var(--color-info-light);">🧠</div>
+            <div class="use-case-body">
+              <div class="use-case-role">@garrytan · 开源公告（985K 阅读 · 764 赞）</div>
+              <div class="use-case-title">10,000+ 文件，3,000+ 人脉档案</div>
+              <p class="use-case-desc">Garry Tan 作为 Y Combinator CEO，一周内就往 GBrain 里导入了 <strong>10,000+ 个 Markdown 文件</strong>、3,000+ 人物档案、13 年的日历数据、280+ 会议记录、300+ 个原创想法。这不是玩具项目，是他真正在用的工作系统。</p>
+              <div class="use-case-quote">"If you want your OpenClaw or Hermes Agent to be able to have perfect total recall of all 10,000+ markdown files, GBrain is here to help."
+                <div class="use-case-source"><a href="https://x.com/garrytan/status/2042497872114090069" target="_blank" rel="noopener"><span class="source-badge x">X</span> @garrytan · 985K Views · 764 Likes ↗</a></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="use-case-card animate-in">
+            <div class="use-case-emoji" style="background: var(--color-success-light);">🌙</div>
+            <div class="use-case-body">
+              <div class="use-case-role">@garrytan · 开源宣言（66.7K 阅读 · 816 赞）</div>
+              <div class="use-case-title">你睡觉时，AI 在帮你整理大脑</div>
+              <p class="use-case-desc">GBrain 有一个"梦境循环"功能：你睡觉时，Agent 自动扫描当天的所有对话，<strong>补充缺失信息、修复引用关系、整合记忆</strong>。简单说就是 — 你醒来的时候，AI 比你睡前更聪明。</p>
+              <div class="use-case-quote">"I'm open sourcing it MIT license so we can all speed up and have our own personal mini-AGI. It's been amazing for me and I want you to have it."
+                <div class="use-case-source"><a href="https://x.com/garrytan/status/2042369335419945338" target="_blank" rel="noopener"><span class="source-badge x">X</span> @garrytan · 66.7K Views · 816 Likes ↗</a></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="use-case-card animate-in">
+            <div class="use-case-emoji" style="background: var(--color-accent-light);">🛡️</div>
+            <div class="use-case-body">
+              <div class="use-case-role">@garrytan · v0.8.0 语音发布（108K 阅读 · 567 赞）</div>
+              <div class="use-case-title">"认知盔甲"— 你控制 AI，而不是反过来</div>
+              <p class="use-case-desc">Garry Tan 把 GBrain 定位为"有意设计的认知盔甲（cognitive armor）"。开源 + 本地存储 = <strong>你在 API 线之上，而不是之下</strong>。v0.8.0 版本加入了语音通话功能，直接跟你的知识库打电话对话。</p>
+              <div class="use-case-quote">"GBrain is my attempt to be in control of my own personal AI that could become my intentionally designed cognitive armor. Open source means you aren't under the API line."
+                <div class="use-case-source"><a href="https://x.com/garrytan/status/2043075944743923845" target="_blank" rel="noopener"><span class="source-badge x">X</span> @garrytan · 25.3K Views ↗</a></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── 第三组：社区真实使用 ── -->
+      <div class="use-cases-group-label animate-in"><span class="label-icon">👥</span> 社区真实使用（X/Twitter & GitHub）</div>
+
+      <div class="screen">
+        <div class="use-cases stagger-children">
+
+          <div class="use-case-card animate-in" style="border: 2px solid var(--color-accent);">
+            <div class="use-case-emoji" style="background: var(--color-accent-light);">🏢</div>
+            <div class="use-case-body">
+              <div class="use-case-role">Jinjing Liang · @JinjingLiang（X/Twitter · 31K 阅读）</div>
+              <div class="use-case-title">8,400+ 页公司知识库，智能搜索效果惊人</div>
+              <p class="use-case-desc">Jinjing Liang 在公司级别部署了 GBrain — 导入了<strong>整个公司的知识库</strong>，包括 8,400+ 页产品文档、工程规范、投资人更新和创始人笔记。全部切片、向量化后索引到 Postgres 数据库中。她特别提到<strong>混合搜索（向量 + 关键词 + RRF 融合）效果出乎意料地好</strong>。</p>
+              <div class="use-case-quote">"Just set up @garrytan's GBrain on our company's entire knowledge base — 8,400+ pages of product docs, eng specs, investor updates, and founder notes. All chunked, embedded, and indexed in Postgres. The hybrid search (vector + keyword + RRF fusion) is surprisingly good."
+                <div class="use-case-source"><a href="https://x.com/JinjingLiang" target="_blank" rel="noopener"><span class="source-badge x">X</span> @JinjingLiang · Apr 11 · 31K Views ↗</a></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="use-case-card animate-in">
+            <div class="use-case-emoji" style="background: var(--color-success-light);">🧪</div>
+            <div class="use-case-body">
+              <div class="use-case-role">Brian Roemmele · @BrianRoemmele（X/Twitter · 14K 阅读）</div>
+              <div class="use-case-title">科技评论人实测后正面评价</div>
+              <p class="use-case-desc">科技评论人 Brian Roemmele（粉丝 280K+）在 GBrain 开源后几小时内就开始测试。他对 GBrain 的<strong>本地优先架构</strong>和 Agent 集成方式给出了正面评价。</p>
+              <div class="use-case-quote">"We love what @garrytan built with GBrain! Have been testing it for the last few hours. Great work here."
+                <div class="use-case-source"><a href="https://x.com/BrianRoemmele/status/2042624343843442967" target="_blank" rel="noopener"><span class="source-badge x">X</span> @BrianRoemmele · 14.1K Views ↗</a></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="use-case-card animate-in">
+            <div class="use-case-emoji" style="background: var(--color-info-light);">🔧</div>
+            <div class="use-case-body">
+              <div class="use-case-role">notjbg · 开发者（GitHub Issue #91）</div>
+              <div class="use-case-title">从本地跑通，正在迁移到云端</div>
+              <p class="use-case-desc">开发者 notjbg 在本地 PGLite 上跑通 GBrain v0.92 后，正在<strong>迁移到 Supabase 云端</strong>部署 — 说明他认为这个工具值得长期使用。在迁移过程中发现了向量序列化 bug 并提交了报告。</p>
+              <div class="use-case-quote">"在迁移过程中发现了 embedding 序列化问题并提交了修复建议 — 这正是开源项目变好的方式。"
+                <div class="use-case-source"><a href="https://github.com/garrytan/gbrain/issues/91" target="_blank" rel="noopener"><span class="source-badge github">GitHub</span> Issue #91 ↗</a></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="use-case-card animate-in">
+            <div class="use-case-emoji" style="background: var(--color-error-light);">🔍</div>
+            <div class="use-case-body">
+              <div class="use-case-role">Penfield Labs · DEV Community 代码审查</div>
+              <div class="use-case-title">独立代码审查：优势与不足</div>
+              <p class="use-case-desc">DEV 社区的深度代码审查（约 6,800 行源码）指出：GBrain 的 <span class="term" data-def="PGLite：一个可以直接嵌入到你应用里的迷你 PostgreSQL 数据库，不需要单独安装数据库软件。">PGLite</span> 存储层和智能搜索是<strong>扎实的基础设施</strong>。但 Dream Cycle 等高级功能目前主要通过提示词文档实现，还不是自动化代码。项目还很年轻，在快速迭代中。</p>
+              <div class="use-case-quote">"基础搜索架构相当靠谱（reasonably competent infrastructure），但要注意这是个一周大的项目 — 期望值要校准。"
+                <div class="use-case-source"><a href="https://dev.to/penfieldlabs/the-yc-president-endorsed-an-ai-memory-system-with-fake-benchmarks-then-he-shipped-his-own-we-4c9l" target="_blank" rel="noopener"><span class="source-badge dev">DEV</span> Penfield Labs 代码审查 ↗</a></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       MODULE 6 — 最简单的上手方式
+       ============================================================ -->
+  <section class="module" id="module-6" style="background: var(--color-bg)">
+    <div class="module-content">
+      <header class="module-header animate-in">
+        <span class="module-number">06</span>
+        <h2 class="module-title">最简单的上手方式</h2>
+        <p class="module-subtitle">三步搞定，不到 5 分钟</p>
+      </header>
+
+      <div class="screen animate-in">
+        <h3 class="screen-heading">前提条件</h3>
+        <p>你需要先安装好这些工具（如果你用 Mac 开发，大概率已经有了）：</p>
+        <div class="pattern-cards stagger-children" style="grid-template-columns: 1fr 1fr;">
+          <div class="pattern-card animate-in">
+            <div class="pattern-icon" style="background: var(--color-accent-light); color: var(--color-accent);">📦</div>
+            <div class="pattern-title">Bun</div>
+            <p class="pattern-desc">JavaScript 运行时和包管理器。安装：<code style="font-family: var(--font-mono); font-size: var(--text-xs); background: var(--color-bg-warm); padding: 2px 6px; border-radius: 3px;">curl -fsSL https://bun.sh/install | bash</code></p>
+          </div>
+          <div class="pattern-card animate-in">
+            <div class="pattern-icon" style="background: var(--color-info-light); color: var(--color-info);">🐙</div>
+            <div class="pattern-title">Git</div>
+            <p class="pattern-desc">版本控制工具。Mac 自带，Windows 去 git-scm.com 下载。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen animate-in">
+        <h3 class="screen-heading">三步开始</h3>
+
+        <div class="step-cards stagger-children">
+          <div class="step-card animate-in">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <strong>下载并安装</strong>
+              <p>把代码下载到你的电脑，安装依赖包。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-block">
+<span class="label">TERMINAL</span>
+<span class="comment"># 下载 GBrain 到你的 home 目录</span>
+<span class="cmd">git clone</span> https://github.com/garrytan/gbrain.git <span class="str">~/gbrain</span>
+
+<span class="comment"># 进入目录，安装依赖</span>
+<span class="cmd">cd</span> ~/gbrain && <span class="cmd">bun install</span> && <span class="cmd">bun link</span></div>
+
+        <div class="step-cards stagger-children">
+          <div class="step-card animate-in">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <strong>初始化数据库</strong>
+              <p>一条命令创建本地数据库，不需要装 PostgreSQL，不需要注册任何账号。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-block">
+<span class="label">TERMINAL</span>
+<span class="comment"># 初始化 — 自动创建嵌入式本地数据库</span>
+<span class="cmd">gbrain init</span></div>
+
+        <div class="step-cards stagger-children">
+          <div class="step-card animate-in">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <strong>导入内容 & 开始提问</strong>
+              <p>把你的笔记文件夹导入，然后就可以开始跟你的知识库对话了。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-block">
+<span class="label">TERMINAL</span>
+<span class="comment"># 导入你的笔记（支持 Markdown 文件）</span>
+<span class="cmd">gbrain import</span> <span class="str">~/你的笔记文件夹/</span>
+
+<span class="comment"># 生成向量索引（需要 OpenAI API Key）</span>
+<span class="cmd">gbrain embed</span> <span class="flag">--stale</span>
+
+<span class="comment"># 开始提问！</span>
+<span class="cmd">gbrain query</span> <span class="str">"我最近在研究什么？"</span></div>
+
+        <div class="callout callout-info animate-in">
+          <span class="callout-icon">💡</span>
+          <div class="callout-content">
+            <span class="callout-title">不想用 OpenAI？</span>
+            <p>向量嵌入需要 OpenAI API Key（少量费用）。如果你暂时不想用，可以先运行 <code style="font-family: var(--font-mono); font-size: var(--text-xs); background: rgba(0,0,0,0.05); padding: 1px 5px; border-radius: 3px;">gbrain import --no-embed</code> 只导入不生成向量，之后再补。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen animate-in">
+        <h3 class="screen-heading">进阶：接入 Claude Code</h3>
+        <p>如果你用 Claude Code 写代码，可以通过 <span class="term" data-def="MCP Server：一种让外部工具暴露接口给 AI 的服务。配好后 Claude Code 就能自动搜索和更新你的 GBrain 知识库。">MCP Server</span> 让 Claude 直接读写你的知识库。</p>
+
+        <div class="code-block">
+<span class="label">CLAUDE CODE 配置</span>
+<span class="comment"># 在 Claude Code 的 MCP 设置中添加：</span>
+{
+  <span class="str">"mcpServers"</span>: {
+    <span class="str">"gbrain"</span>: {
+      <span class="str">"command"</span>: <span class="str">"gbrain"</span>,
+      <span class="str">"args"</span>: [<span class="str">"mcp"</span>]
+    }
+  }
+}</div>
+
+        <p>配好后，Claude Code 就能使用 <code style="font-family: var(--font-mono); font-size: var(--text-xs); background: var(--color-bg-warm); padding: 2px 6px; border-radius: 3px;">search</code>、<code style="font-family: var(--font-mono); font-size: var(--text-xs); background: var(--color-bg-warm); padding: 2px 6px; border-radius: 3px;">get_page</code>、<code style="font-family: var(--font-mono); font-size: var(--text-xs); background: var(--color-bg-warm); padding: 2px 6px; border-radius: 3px;">put_page</code> 等 30+ 个工具来读写你的知识库。</p>
+      </div>
+
+      <div class="callout callout-success animate-in">
+        <span class="callout-icon">🎉</span>
+        <div class="callout-content">
+          <span class="callout-title">就这么简单！</span>
+          <p>从 clone 到第一次提问，整个过程不到 5 分钟。之后每次 AI 对话都会让你的知识库变得更丰富。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  </main>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="footer">
+    <p>GBrain 小白指南 &middot; 基于 <a href="https://github.com/garrytan/gbrain" target="_blank">garrytan/gbrain</a> &middot; MIT License</p>
+    <p style="margin-top: var(--space-2);">GitHub Stars: 7,000+ &middot; 创建者: Garry Tan (YC CEO)</p>
+  </footer>
+
+
+  <!-- ============================================================
+       JAVASCRIPT
+       ============================================================ -->
+  <script>
+  /* ===========================================
+     SCROLL ANIMATIONS (Intersection Observer)
+     =========================================== */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { rootMargin: '0px 0px -10% 0px', threshold: 0.1 });
+
+  document.querySelectorAll('.animate-in').forEach(el => observer.observe(el));
+
+  // Stagger children
+  document.querySelectorAll('.stagger-children').forEach(parent => {
+    Array.from(parent.children).forEach((child, i) => {
+      child.style.setProperty('--stagger-index', i);
+    });
+  });
+
+  /* ===========================================
+     PROGRESS BAR
+     =========================================== */
+  const progressBar = document.getElementById('progress-bar');
+  function updateProgressBar() {
+    const scrollTop = window.scrollY;
+    const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+    progressBar.style.width = progress + '%';
+  }
+  window.addEventListener('scroll', () => requestAnimationFrame(updateProgressBar), { passive: true });
+
+  /* ===========================================
+     NAV DOTS
+     =========================================== */
+  const navDots = document.querySelectorAll('.nav-dot');
+  const sections = [];
+  navDots.forEach(dot => {
+    const target = document.getElementById(dot.dataset.target);
+    if (target) {
+      sections.push({ dot, target });
+      dot.addEventListener('click', () => {
+        target.scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+  });
+
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navDots.forEach(d => d.classList.remove('active'));
+        const match = sections.find(s => s.target === entry.target);
+        if (match) match.dot.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+
+  sections.forEach(s => sectionObserver.observe(s.target));
+
+  /* ===========================================
+     CHAT ANIMATION
+     =========================================== */
+  const chatData = {
+    'chat-problem': [
+      { sender: '你', color: 'var(--color-actor-5)', avatar: '你', text: '帮我总结一下昨天跟李总的会议内容' },
+      { sender: 'AI', color: 'var(--color-actor-1)', avatar: 'AI', text: '抱歉，我没有昨天会议的信息。你能把会议内容发给我吗？' },
+      { sender: '你', color: 'var(--color-actor-5)', avatar: '你', text: '……我昨天不是跟你讨论过了吗？' },
+      { sender: 'AI', color: 'var(--color-actor-1)', avatar: 'AI', text: '很抱歉，我无法访问之前的对话内容。每次新对话我都是从零开始的。😅' },
+      { sender: '你', color: 'var(--color-actor-5)', avatar: '你', text: '好吧……（又要从头解释 10 分钟）' },
+      { sender: '旁白', color: 'var(--color-actor-4)', avatar: '💡', text: '如果 AI 有 GBrain，它会说："昨天你和李总讨论了 Q3 预算和新产品线，李总倾向于方案 B，你答应这周五前给他修改版。"' },
+    ]
+  };
+
+  const chatStates = {};
+  function initChat(chatId) {
+    chatStates[chatId] = { current: 0, playing: false };
+  }
+  Object.keys(chatData).forEach(initChat);
+
+  function showNextMessage(chatId) {
+    const state = chatStates[chatId];
+    const messages = chatData[chatId];
+    if (!messages || state.current >= messages.length) return;
+
+    const container = document.getElementById(chatId + '-messages');
+    const typing = document.getElementById(chatId + '-typing');
+    const progress = document.getElementById(chatId + '-progress');
+    const msg = messages[state.current];
+
+    // Show typing
+    typing.style.display = 'flex';
+    typing.querySelector('.chat-avatar').style.background = msg.color;
+    typing.querySelector('.chat-avatar').textContent = msg.avatar;
+
+    setTimeout(() => {
+      typing.style.display = 'none';
+      const el = document.createElement('div');
+      el.className = 'chat-message';
+      el.innerHTML = `
+        <div class="chat-avatar" style="background: ${msg.color}">${msg.avatar}</div>
+        <div class="chat-bubble">
+          <span class="chat-sender" style="color: ${msg.color}">${msg.sender}</span>
+          <p>${msg.text}</p>
+        </div>`;
+      container.appendChild(el);
+      container.scrollTop = container.scrollHeight;
+      state.current++;
+      if (progress) progress.textContent = state.current + ' / ' + messages.length;
+    }, 800);
+  }
+
+  function playAllMessages(chatId) {
+    const state = chatStates[chatId];
+    const messages = chatData[chatId];
+    if (state.playing) return;
+    state.playing = true;
+    function next() {
+      if (state.current < messages.length) {
+        showNextMessage(chatId);
+        setTimeout(next, 1400);
+      } else {
+        state.playing = false;
+      }
+    }
+    next();
+  }
+
+  function resetChat(chatId) {
+    const container = document.getElementById(chatId + '-messages');
+    const progress = document.getElementById(chatId + '-progress');
+    container.innerHTML = '';
+    chatStates[chatId] = { current: 0, playing: false };
+    if (progress) progress.textContent = '';
+  }
+
+  // Wire up chat buttons
+  document.querySelectorAll('.chat-next-btn').forEach(btn => {
+    btn.addEventListener('click', () => showNextMessage(btn.dataset.chat));
+  });
+  document.querySelectorAll('.chat-all-btn').forEach(btn => {
+    btn.addEventListener('click', () => playAllMessages(btn.dataset.chat));
+  });
+  document.querySelectorAll('.chat-reset-btn').forEach(btn => {
+    btn.addEventListener('click', () => resetChat(btn.dataset.chat));
+  });
+
+  /* ===========================================
+     FLOW ANIMATION (Read-Write Loop)
+     =========================================== */
+  const flowData = {
+    'flow-rw': {
+      steps: [
+        { label: '📨 信号到达 — 你发了一条消息，或者邮件/日历有了新事件', highlight: 'flow-rw-signal' },
+        { label: '🔍 读取记忆 — AI 在 GBrain 中搜索相关上下文，了解你是谁、之前聊了什么', highlight: 'flow-rw-read' },
+        { label: '💬 智能回复 — 基于完整的背景知识，给出精准的回答', highlight: 'flow-rw-respond' },
+        { label: '✍️ 写入新知识 — 把这次对话中的新信息写回 GBrain', highlight: 'flow-rw-write' },
+        { label: '📇 索引入库 — 生成向量索引，为下次查询做好准备', highlight: 'flow-rw-index' },
+      ],
+      current: 0
+    }
+  };
+
+  function flowNext(flowId) {
+    const flow = flowData[flowId];
+    if (!flow || flow.current >= flow.steps.length) return;
+
+    // Clear previous highlights
+    document.querySelectorAll(`#${flowId} .flow-actor`).forEach(a => a.classList.remove('highlighted'));
+
+    const step = flow.steps[flow.current];
+    const label = document.getElementById(flowId + '-label');
+    const progress = document.getElementById(flowId + '-progress');
+
+    // Highlight current actor
+    const actor = document.getElementById(step.highlight);
+    if (actor) actor.classList.add('highlighted');
+
+    label.textContent = step.label;
+    flow.current++;
+    if (progress) progress.textContent = flow.current + ' / ' + flow.steps.length;
+  }
+
+  function flowReset(flowId) {
+    const flow = flowData[flowId];
+    if (!flow) return;
+    flow.current = 0;
+    document.querySelectorAll(`#${flowId} .flow-actor`).forEach(a => a.classList.remove('highlighted'));
+    document.getElementById(flowId + '-label').textContent = '点击「下一步」开始';
+    const progress = document.getElementById(flowId + '-progress');
+    if (progress) progress.textContent = '';
+  }
+
+  document.querySelectorAll('.flow-next-btn').forEach(btn => {
+    btn.addEventListener('click', () => flowNext(btn.dataset.flow));
+  });
+  document.querySelectorAll('.flow-reset-btn').forEach(btn => {
+    btn.addEventListener('click', () => flowReset(btn.dataset.flow));
+  });
+
+  /* ===========================================
+     QUIZ INTERACTIONS
+     =========================================== */
+  document.querySelectorAll('.quiz-options').forEach(optionsEl => {
+    const quizId = optionsEl.dataset.quiz;
+    const correctIdx = parseInt(optionsEl.dataset.answer, 10);
+    const buttons = optionsEl.querySelectorAll('.quiz-option');
+    const explain = document.getElementById(quizId + '-explain');
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.idx, 10);
+        // Disable all buttons
+        buttons.forEach(b => b.classList.add('disabled'));
+        // Mark correct/wrong
+        if (idx === correctIdx) {
+          btn.classList.add('correct');
+        } else {
+          btn.classList.add('wrong');
+          buttons[correctIdx].classList.add('correct');
+        }
+        // Show explanation
+        if (explain) explain.classList.add('show');
+      });
+    });
+  });
+
+  /* ===========================================
+     KEYBOARD NAVIGATION
+     =========================================== */
+  document.addEventListener('keydown', (e) => {
+    if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
+    const allSections = [...document.querySelectorAll('.hero, .module')];
+    const currentIdx = sections.findIndex(s => s.dot.classList.contains('active'));
+
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      if (currentIdx < sections.length - 1) {
+        sections[currentIdx + 1].target.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+    if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      if (currentIdx > 0) {
+        sections[currentIdx - 1].target.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  });
+  </script>
+
+</body>
+</html>
