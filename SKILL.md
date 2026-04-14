@@ -22,6 +22,16 @@ When the skill triggers and the user hasn't specified a repo yet, introduce your
 
 If the user provides a GitHub URL, browse the repo README and key files first. If they reference a local path, read it directly.
 
+## Language Confirmation
+
+After receiving a repo URL and before starting research, ask the user which language to use for the guide:
+
+> **请问指南使用中文还是 English？**
+> - 中文（默认）
+> - English
+
+Use the selected language for ALL content in the generated HTML (module titles, descriptions, quiz questions, callouts, footer, etc.). If the user's initial message is in English, default to English without asking.
+
 ## Who This Is For
 
 The target reader is a **non-technical person** or a developer **evaluating whether to use this tool**. They saw the repo trending on GitHub, heard about it on X/Twitter, or got a recommendation — and want to understand what it does, why it matters, and how to get started.
@@ -269,7 +279,7 @@ Generate a **single self-contained HTML file** with all CSS and JS inline. The f
 - Support keyboard navigation (arrow keys)
 - Have scroll-snap for section-by-section navigation
 - Include a progress bar and navigation dots
-- Use Chinese (简体中文) for all content by default, or match the user's language
+- Use the language confirmed with the user (Chinese or English) for all content
 
 Save the file next to the source material, or in the user's specified location.
 

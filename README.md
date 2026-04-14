@@ -37,7 +37,7 @@ Every section includes interactive elements — quizzes, animated conversations,
 
 | Repo | Guide |
 |------|-------|
-| [garrytan/gbrain](https://github.com/garrytan/gbrain) | [gbrain-guide.html](examples/gbrain-guide.html) · [gbrain-guide-v2.html](examples/gbrain-guide-v2.html) |
+| [garrytan/gbrain](https://github.com/garrytan/gbrain) | [gbrain-guide-v2.html](examples/gbrain-guide-v2.html) |
 | [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) | [karpathy-skills-guide.html](examples/karpathy-skills-guide.html) |
 
 > Download the HTML file and open it in your browser — everything is self-contained.
@@ -141,8 +141,7 @@ github-guide/
 │   ├── design-system.md              # Design tokens & CSS variables
 │   └── interactive-elements.md       # 9 interactive component patterns
 └── examples/
-    ├── gbrain-guide.html             # Example: garrytan/gbrain
-    ├── gbrain-guide-v2.html          # Example: garrytan/gbrain (v2)
+    ├── gbrain-guide-v2.html          # Example: garrytan/gbrain
     └── karpathy-skills-guide.html    # Example: andrej-karpathy-skills
 ```
 
