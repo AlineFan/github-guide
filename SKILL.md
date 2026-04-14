@@ -36,6 +36,16 @@ The target reader is a **non-technical person** or a developer **evaluating whet
 
 ## Core Principles
 
+### 0. Professional Tone — No Colloquial or Joking Expressions
+
+Write in clear, professional Chinese. Avoid aggressive/colloquial phrasing:
+- "说人话" → "所有术语都有白话解释"
+- "只用真实案例" → "每条用户评价都经过验证"
+- "互动学习" → "用互动元素代替大段文字"
+- "随便用，不用付费" → "免费使用，可自由修改和分发"
+
+Translate interactive element names to Chinese descriptions (e.g., "Chat Animation" → "对话动画：用模拟对话演示问题").
+
 ### 1. Every Technical Term Gets a Plain-Language Explanation
 
 Don't just name things — explain what they mean for normal people. This applies everywhere:
@@ -131,9 +141,23 @@ Search for verified, high-engagement user testimonials. Use subagents for parall
 - If Reddit/HN have no results, honestly report that
 
 ### Step 3: Find Alternatives
-Search for competing/similar projects. For each, find:
+
+First identify the **core problem** the repo solves (e.g., "AI has no long-term memory"). Then find other projects that solve **the same problem directly**.
+
+**Selection criteria — choose competitors that are:**
+- **Same problem, same category**: standalone tools/libraries a user would choose between (e.g., for AI memory: Mem0, Khoj, Letta — all open-source AI memory projects)
+- **Open-source with their own GitHub repo** so you can link and compare stars
+- **Actively maintained** with meaningful adoption (1K+ stars preferred)
+
+**Do NOT include as competitors:**
+- Built-in features of other products (e.g., "Claude Memory" is a feature, not a competing project)
+- DIY workarounds or tool combinations (e.g., "Obsidian + RAG plugin" is a workaround, not a purpose-built solution)
+- Projects that only tangentially relate to the problem
+
+**For each selected competitor, find:**
 - GitHub repo URL
 - Stars count
+- License type
 - Core differentiator
 - Trade-offs vs. the main project
 
@@ -165,9 +189,27 @@ The HTML guide follows this exact module structure:
 
 ### Module 4: Comparison with Alternatives
 - 3 approach cards showing different ways to solve the problem
-- **Comparison table** with the project highlighted
-- Table headers link to competitor GitHub repos where applicable
+- **Comparison table** with the project highlighted (include GitHub Stars row, license type)
+- Table headers link to competitor GitHub repos (all competitors must have their own repo)
 - **Decision flow chart** — nested questions leading to recommendations
+
+### Before → After + 谁需要这个 (Between Module 4 and Module 5)
+
+This section serves as a summary/bridge after the reader has understood the project and seen alternatives. It contains:
+
+**Before → After comparison:**
+- Left card (red tint): 6 pain points of life WITHOUT the project
+- Right card (green tint): 6 improvements AFTER using the project
+- This shows **real user experience changes**, NOT terminology translation or glossary
+- Use concrete, relatable scenarios (e.g., "每次开新对话都要花 10 分钟给 AI 解释背景" → "AI 自动关联上下文")
+
+**谁需要这个？ (Who needs this?):**
+- 5 scenario tags describing target users in specific, relatable terms
+- Use pill-shaped tags with hover effect
+
+**Do NOT include in this section:**
+- Module overview tables or any meta-content about the guide's own structure
+- Design principle badges
 
 ### Module 5: Real Use Cases
 Organized into 3 groups, each with a labeled header:
@@ -193,7 +235,10 @@ Organized into 3 groups, each with a labeled header:
 - Success callout
 
 ### Footer
-- Links to repo, license, author
+- **Must be placed INSIDE the last section** (not as a standalone element after `</main>`), to avoid scroll-snap bounce
+- Line 1: "{Project} 小白指南 · 基于 {author}/{repo} · {License}"
+- Line 2: "Made by github-guide · skill作者: 林锵锵 · 小红书 · X" with clickable links
+- Use muted text color, not black
 
 ## Design System
 

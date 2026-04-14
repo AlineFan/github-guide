@@ -27,6 +27,7 @@ Get back a **single HTML file** (no build step, no dependencies) containing:
 | **How It Works** | Step-by-step flow animation + data journey diagram |
 | **Architecture** | Mind map with beginner-friendly labels |
 | **Comparison** | Table + decision flow chart ("which tool should I pick?") |
+| **Before → After** | User experience before vs after using the project + "Who needs this?" |
 | **Real Use Cases** | Verified cases from X/Twitter, GitHub, blogs with source links |
 | **Quick Start** | Copy-paste setup commands |
 
@@ -36,7 +37,7 @@ Every section includes interactive elements — quizzes, animated conversations,
 
 | Repo | Guide |
 |------|-------|
-| [garrytan/gbrain](https://github.com/garrytan/gbrain) | [gbrain-guide.html](examples/gbrain-guide.html) |
+| [garrytan/gbrain](https://github.com/garrytan/gbrain) | [gbrain-guide.html](examples/gbrain-guide.html) · [gbrain-guide-v2.html](examples/gbrain-guide-v2.html) |
 | [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) | [karpathy-skills-guide.html](examples/karpathy-skills-guide.html) |
 
 > Download the HTML file and open it in your browser — everything is self-contained.
@@ -78,6 +79,10 @@ The skill will:
 
 ## Design Principles
 
+### Professional tone
+
+Clear, professional Chinese. No colloquial or joking expressions. All interactive element names translated to Chinese descriptions.
+
 ### Beginner-first
 
 Every technical term gets a plain-language explanation. Architecture diagrams have "what this means for you" subtitles. The target reader saw the repo trending and wants to understand it — not read the source code.
@@ -94,9 +99,9 @@ Every use case shown in the guide must:
 
 Concepts are taught through chat animations, flow diagrams, data journeys, mind maps, decision trees, and quizzes — not paragraphs.
 
-### Honest comparisons
+### Honest comparisons with direct competitors
 
-The comparison section links to competitor repos, shows both strengths and weaknesses, and includes a decision flow chart to help readers choose.
+The comparison section only includes projects that solve **the same problem directly** — standalone open-source tools a user would choose between. Does not include built-in features of other products or DIY workaround combinations. Links to competitor repos, shows both strengths and weaknesses, includes a decision flow chart.
 
 ## Design System
 
@@ -137,6 +142,7 @@ github-guide/
 │   └── interactive-elements.md       # 9 interactive component patterns
 └── examples/
     ├── gbrain-guide.html             # Example: garrytan/gbrain
+    ├── gbrain-guide-v2.html          # Example: garrytan/gbrain (v2)
     └── karpathy-skills-guide.html    # Example: andrej-karpathy-skills
 ```
 
