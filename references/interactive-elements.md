@@ -399,3 +399,122 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { /* prev section */ }
 });
 ```
+
+---
+
+## 10. Before / After Cards
+
+Shows user experience change — what life is like without vs. with the project. **NOT terminology translation** — show pain points and improvements.
+
+### HTML Structure
+```html
+<div class="ba-grid">
+  <div class="ba-card ba-card--before animate-in">
+    <div class="ba-label">❌ Without [Project]</div>
+    <div class="ba-item">Pain point 1 the user experiences today</div>
+    <div class="ba-item">Pain point 2 the user experiences today</div>
+    <div class="ba-item">Pain point 3 the user experiences today</div>
+  </div>
+  <div class="ba-card ba-card--after animate-in">
+    <div class="ba-label">✅ With [Project]</div>
+    <div class="ba-item">Improved experience 1</div>
+    <div class="ba-item">Improved experience 2</div>
+    <div class="ba-item">Improved experience 3</div>
+  </div>
+</div>
+```
+
+### CSS
+```css
+.ba-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: var(--space-4); margin-bottom: var(--space-10);
+}
+.ba-card {
+  border-radius: var(--radius-md); padding: var(--space-5);
+  border: 1px solid var(--color-border);
+}
+.ba-card--before { background: #FEF2F2; border-color: #FECACA; }
+.ba-card--after  { background: #F0FDF4; border-color: #BBF7D0; }
+.ba-label {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: var(--space-3);
+}
+.ba-card--before .ba-label { color: #DC2626; }
+.ba-card--after  .ba-label { color: #16A34A; }
+.ba-item {
+  font-size: var(--text-sm); color: var(--color-text-secondary);
+  line-height: 1.8; padding: var(--space-1) 0;
+}
+@media (max-width: 600px) { .ba-grid { grid-template-columns: 1fr; } }
+```
+
+---
+
+## 11. Scenario Tags
+
+Show who specifically benefits from this project. Place below Before/After cards.
+
+### HTML Structure
+```html
+<div class="scenario-tags">
+  <span class="scenario-tag">👩‍💻 Software developers</span>
+  <span class="scenario-tag">📊 Product managers</span>
+  <span class="scenario-tag">🎓 CS students</span>
+  <span class="scenario-tag">🏗️ System architects</span>
+</div>
+```
+
+### CSS
+```css
+.scenario-tags {
+  display: flex; flex-wrap: wrap; gap: var(--space-2); justify-content: center;
+}
+.scenario-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius-full); font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  transition: all var(--duration-fast);
+}
+.scenario-tag:hover {
+  border-color: var(--color-accent); color: var(--color-accent);
+  background: var(--color-accent-light);
+}
+```
+
+---
+
+## 12. Footer (Inside Last Section)
+
+**CRITICAL**: Place footer inside the last `<section>`, not after `</main>`. Prevents scroll-snap bounce.
+
+### HTML Structure
+```html
+<!-- Inside the last <section>, at the bottom -->
+<div class="footer-inner">
+  <p>Interactive guide generated with ⚡</p>
+  <div class="footer-links">
+    <span>Skill Author: <a href="https://github.com/AlineFan" target="_blank">@AlineFan</a></span>
+    <span class="footer-sep">·</span>
+    <span>Source: <a href="REPO_URL" target="_blank">GitHub</a></span>
+  </div>
+</div>
+```
+
+### CSS
+```css
+.footer-inner {
+  text-align: center; padding: var(--space-10) var(--space-6);
+  background: var(--color-bg-warm); border-top: 1px solid var(--color-border-light);
+  margin-top: var(--space-10);
+}
+.footer-inner p { font-size: var(--text-sm); color: var(--color-text-muted); }
+.footer-inner a { color: var(--color-accent); text-decoration: none; }
+.footer-inner a:hover { text-decoration: underline; }
+.footer-links {
+  display: inline-flex; align-items: center; gap: 12px;
+  flex-wrap: wrap; justify-content: center; margin-top: var(--space-2);
+}
+```

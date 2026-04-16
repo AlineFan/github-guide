@@ -168,3 +168,16 @@ document.querySelectorAll('.stagger-children').forEach(parent => {
 .source-badge.hn       { background: #ff6600; }
 .source-badge.community { background: var(--color-accent); }
 ```
+
+## Before / After Cards
+
+```css
+.ba-card--before { background: #FEF2F2; border-color: #FECACA; }
+.ba-card--after  { background: #F0FDF4; border-color: #BBF7D0; }
+.ba-card--before .ba-label { color: #DC2626; }
+.ba-card--after  .ba-label { color: #16A34A; }
+```
+
+## Footer
+
+Footer must be **inside the last `<section>`** to avoid scroll-snap bounce. Use `.footer-inner` class.

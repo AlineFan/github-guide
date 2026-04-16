@@ -7,6 +7,15 @@ description: "Turn any GitHub repository into a beginner-friendly interactive HT
 
 Transform any GitHub repository into a stunning, beginner-friendly interactive HTML guide. The output is a **single self-contained HTML file** — open it directly in the browser with no setup required (only external dependency: Google Fonts CDN). The guide explains what the project does, how it works, how it compares to alternatives, and how to get started — all through interactive visualizations, plain-language explanations, and verified real-world use cases.
 
+## Language Confirmation
+
+Before starting, ask the user:
+
+> **Would you like this guide in Chinese (中文) or English?**
+
+If the user's message is in English, default to English without asking.
+If the user's message is in Chinese, default to Chinese without asking.
+
 ## First-Run Welcome
 
 When the skill triggers and the user hasn't specified a repo yet, introduce yourself:
@@ -22,16 +31,6 @@ When the skill triggers and the user hasn't specified a repo yet, introduce your
 
 If the user provides a GitHub URL, browse the repo README and key files first. If they reference a local path, read it directly.
 
-## Language Confirmation
-
-After receiving a repo URL and before starting research, ask the user which language to use for the guide:
-
-> **请问指南使用中文还是 English？**
-> - 中文（默认）
-> - English
-
-Use the selected language for ALL content in the generated HTML (module titles, descriptions, quiz questions, callouts, footer, etc.). If the user's initial message is in English, default to English without asking.
-
 ## Who This Is For
 
 The target reader is a **non-technical person** or a developer **evaluating whether to use this tool**. They saw the repo trending on GitHub, heard about it on X/Twitter, or got a recommendation — and want to understand what it does, why it matters, and how to get started.
@@ -46,15 +45,16 @@ The target reader is a **non-technical person** or a developer **evaluating whet
 
 ## Core Principles
 
-### 0. Professional Tone — No Colloquial or Joking Expressions
+### 0. Professional Tone — Warm Expert, Not Cheerleader
 
-Write in clear, professional Chinese. Avoid aggressive/colloquial phrasing:
-- "说人话" → "所有术语都有白话解释"
-- "只用真实案例" → "每条用户评价都经过验证"
-- "互动学习" → "用互动元素代替大段文字"
-- "随便用，不用付费" → "免费使用，可自由修改和分发"
+Write like a patient mentor explaining to a smart friend. Avoid:
+- Hype words: "amazing", "revolutionary", "game-changing", "powerful"
+- Excessive emojis in body text (icons in UI elements like cards/badges are fine)
+- Marketing copy tone — this is an educational guide, not a landing page
+- Condescension — explain jargon, but don't simplify the ideas themselves
 
-Translate interactive element names to Chinese descriptions (e.g., "Chat Animation" → "对话动画：用模拟对话演示问题").
+Good: "GBrain stores your conversations and notes so Claude can reference them next time."
+Bad: "GBrain is an AMAZING tool that REVOLUTIONIZES how you interact with AI! 🚀🔥"
 
 ### 1. Every Technical Term Gets a Plain-Language Explanation
 
@@ -106,13 +106,30 @@ Every major concept should have at least one interactive element:
 - **Quizzes** — test understanding after each major module (at least 3 total)
 - **Mind maps** — show architecture with beginner-friendly labels
 
-### 4. Compare Honestly
+### 4. Compare Honestly — Direct Competitors Only
 
-When comparing with alternatives:
-- Include clickable links to competitor GitHub repos
+When selecting competitors for comparison:
+- **Same-problem competitors only** — tools that solve the exact same problem, not built-in features or DIY workarounds
+- **Not built-in features** — e.g., for a memory tool, don't compare with "Claude's built-in memory" (that's a platform feature, not a competing project)
+- **Not DIY approaches** — e.g., don't compare with "manually copy-paste into Obsidian" (that's a workaround, not a product)
+- **Must be installable/deployable projects** with their own GitHub repo or product page
+
+For each competitor:
+- Include clickable links to their GitHub repos
 - Show both strengths AND weaknesses
 - Use a decision flow chart ("not sure which to choose? follow this flow")
 - Don't be a marketing page — be a fair comparison
+
+### 5. Quizzes Test Application, Not Recall
+
+Every quiz must test whether the reader can **apply** the concept, not just repeat it.
+
+**Bad (recall):** "What does MCP stand for?"
+**Good (application):** "Your AI assistant forgets everything between sessions. Which approach would help it remember your project context?"
+
+- Wrong answers should be **plausible misconceptions**, not obvious jokes
+- Feedback text must explain **why** the answer is correct/incorrect
+- At least 3 quizzes total, spread across modules
 
 ## Research Phase
 
@@ -151,23 +168,9 @@ Search for verified, high-engagement user testimonials. Use subagents for parall
 - If Reddit/HN have no results, honestly report that
 
 ### Step 3: Find Alternatives
-
-First identify the **core problem** the repo solves (e.g., "AI has no long-term memory"). Then find other projects that solve **the same problem directly**.
-
-**Selection criteria — choose competitors that are:**
-- **Same problem, same category**: standalone tools/libraries a user would choose between (e.g., for AI memory: Mem0, Khoj, Letta — all open-source AI memory projects)
-- **Open-source with their own GitHub repo** so you can link and compare stars
-- **Actively maintained** with meaningful adoption (1K+ stars preferred)
-
-**Do NOT include as competitors:**
-- Built-in features of other products (e.g., "Claude Memory" is a feature, not a competing project)
-- DIY workarounds or tool combinations (e.g., "Obsidian + RAG plugin" is a workaround, not a purpose-built solution)
-- Projects that only tangentially relate to the problem
-
-**For each selected competitor, find:**
+Search for competing/similar projects. For each, find:
 - GitHub repo URL
 - Stars count
-- License type
 - Core differentiator
 - Trade-offs vs. the main project
 
@@ -198,28 +201,41 @@ The HTML guide follows this exact module structure:
 - **Quiz #3** — test understanding of architecture
 
 ### Module 4: Comparison with Alternatives
-- 3 approach cards showing different ways to solve the problem
-- **Comparison table** with the project highlighted (include GitHub Stars row, license type)
-- Table headers link to competitor GitHub repos (all competitors must have their own repo)
+- 3 approach cards showing different ways to solve the problem (direct competitors only — see Principle #4)
+- **Comparison table** with the project highlighted
+- Table headers link to competitor GitHub repos where applicable
 - **Decision flow chart** — nested questions leading to recommendations
 
-### Before → After + 谁需要这个 (Between Module 4 and Module 5)
+### Module 4.5: Before → After
+Show the reader's **experience change** — what life is like without vs. with this tool.
 
-This section serves as a summary/bridge after the reader has understood the project and seen alternatives. It contains:
+- **Before/After cards** (`.ba-grid` > `.ba-card--before` + `.ba-card--after`)
+  - Before: pain points, frustrations, inefficiencies the user faces today
+  - After: how the experience improves with this project
+- **NOT terminology translation** — don't explain what terms mean. Show what changes for the user.
+- **Scenario tags** (`.scenario-tags`) — who specifically benefits: roles, situations, use cases
+- Place this between Comparison and Use Cases — the reader now knows what the tool does, how it compares, and this module answers "what would actually change for me?"
 
-**Before → After comparison:**
-- Left card (red tint): 6 pain points of life WITHOUT the project
-- Right card (green tint): 6 improvements AFTER using the project
-- This shows **real user experience changes**, NOT terminology translation or glossary
-- Use concrete, relatable scenarios (e.g., "每次开新对话都要花 10 分钟给 AI 解释背景" → "AI 自动关联上下文")
-
-**谁需要这个？ (Who needs this?):**
-- 5 scenario tags describing target users in specific, relatable terms
-- Use pill-shaped tags with hover effect
-
-**Do NOT include in this section:**
-- Module overview tables or any meta-content about the guide's own structure
-- Design principle badges
+```html
+<div class="ba-grid">
+  <div class="ba-card ba-card--before animate-in">
+    <div class="ba-label">❌ Without [Project]</div>
+    <div class="ba-item">Pain point 1 the user experiences</div>
+    <div class="ba-item">Pain point 2 the user experiences</div>
+    <div class="ba-item">Pain point 3 the user experiences</div>
+  </div>
+  <div class="ba-card ba-card--after animate-in">
+    <div class="ba-label">✅ With [Project]</div>
+    <div class="ba-item">Improved experience 1</div>
+    <div class="ba-item">Improved experience 2</div>
+    <div class="ba-item">Improved experience 3</div>
+  </div>
+</div>
+<div class="scenario-tags">
+  <span class="scenario-tag">👩‍💻 Role/persona 1</span>
+  <span class="scenario-tag">📊 Role/persona 2</span>
+</div>
+```
 
 ### Module 5: Real Use Cases
 Organized into 3 groups, each with a labeled header:
@@ -244,11 +260,10 @@ Organized into 3 groups, each with a labeled header:
 - Advanced integration example (if applicable)
 - Success callout
 
-### Footer
-- **Must be placed INSIDE the last section** (not as a standalone element after `</main>`), to avoid scroll-snap bounce
-- Line 1: "{Project} 小白指南 · 基于 {author}/{repo} · {License}"
-- Line 2: "Made by github-guide · skill作者: 林锵锵 · 小红书 · X" with clickable links
-- Use muted text color, not black
+### Footer (Inside Last Section)
+- Links to repo, license, skill author
+- **CRITICAL**: Footer HTML must be placed **inside** the last `<section>` element, not after `</main>`. If placed outside, scroll-snap causes a bounce effect where users can't scroll past the last module.
+- Use the `.footer-inner` class for the footer content block
 
 ## Design System
 
@@ -265,10 +280,11 @@ Read `references/interactive-elements.md` for complete HTML/CSS/JS patterns for:
 - Chat animation (message queue with typing indicator)
 - Flow animation (actors + step labels + highlight)
 - Data journey (vertical flow with icons)
-- Quiz (multiple choice with instant feedback)
+- Quiz (multiple choice with instant feedback — application, not recall)
 - Decision flow (nested branching chart)
 - Glossary tooltips (hover-to-reveal definitions)
 - Mind map (center node + branches)
+- Before/After cards + Scenario tags
 - Navigation dots + progress bar
 
 ## Output Format
@@ -279,7 +295,7 @@ Generate a **single self-contained HTML file** with all CSS and JS inline. The f
 - Support keyboard navigation (arrow keys)
 - Have scroll-snap for section-by-section navigation
 - Include a progress bar and navigation dots
-- Use the language confirmed with the user (Chinese or English) for all content
+- Use Chinese (简体中文) for all content by default, or match the user's language
 
 Save the file next to the source material, or in the user's specified location.
 
@@ -287,15 +303,22 @@ Save the file next to the source material, or in the user's specified location.
 
 Before delivering the HTML file, verify:
 
+- [ ] Language consistent (all Chinese or all English, matching user's choice)
+- [ ] Professional tone — no hype words, no excessive emojis in body text
 - [ ] Every technical term has either a tooltip or inline explanation
-- [ ] At least 3 interactive quizzes with correct answers and explanations
+- [ ] At least 3 interactive quizzes — testing **application**, not recall
 - [ ] All use cases are verified as being about THIS specific repo
 - [ ] All use cases have clickable source links
 - [ ] X/Twitter cases show engagement metrics (views, likes)
+- [ ] Competitors are **direct same-problem competitors** (not built-in features or DIY workarounds)
 - [ ] Comparison table links to competitor GitHub repos
 - [ ] Decision flow chart is included in comparison section
+- [ ] Before→After module shows **user experience change** (not terminology explanation)
+- [ ] Scenario tags identify who benefits
 - [ ] Data journey diagram is included in "how it works" section
 - [ ] Mind map branches have beginner-friendly descriptions
 - [ ] Chat animation demonstrates the core problem
+- [ ] **Footer is inside the last `<section>`** (not after `</main>`)
+- [ ] **Nav dots count matches section count**
 - [ ] Page is responsive and works on mobile
 - [ ] All interactive elements (quizzes, flow, chat) work correctly
