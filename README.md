@@ -1,24 +1,23 @@
 # /github-guide
 
-A Claude Code skill that turns any GitHub repository into a beautiful, interactive beginner-friendly HTML guide.
-
-Point it at any repo and get a single self-contained HTML page with animated diagrams, comparison charts, interactive quizzes, and verified real-world use cases.
+A Claude Code skill that explains any GitHub repository — in **two modes** depending on the reader.
 
 <p align="center">
   <img src="https://img.shields.io/badge/Claude_Code-skill-teal?style=flat-square" alt="Claude Code Skill">
-  <img src="https://img.shields.io/badge/output-single_HTML-orange?style=flat-square" alt="Single HTML Output">
+  <img src="https://img.shields.io/badge/Mode_A-HTML_beginner_guide-orange?style=flat-square" alt="Mode A">
+  <img src="https://img.shields.io/badge/Mode_B-Markdown_deep--dive-blueviolet?style=flat-square" alt="Mode B">
   <img src="https://img.shields.io/badge/language-中文_/_EN-blue?style=flat-square" alt="Language">
 </p>
 
-## What It Does
+## Two Modes
 
-Give it a GitHub URL:
+### Mode A — HTML Beginner Guide (default)
+
+For non-technical readers or developers evaluating whether to adopt a tool. Output: a single self-contained HTML file with theme, SVG charts, quizzes, animations.
 
 ```
 /github-guide https://github.com/user/repo
 ```
-
-Get back a **single HTML file** (no build step, no dependencies) containing:
 
 | Module | Content |
 |--------|---------|
@@ -31,9 +30,24 @@ Get back a **single HTML file** (no build step, no dependencies) containing:
 | **Real Use Cases** | Verified cases from X/Twitter, GitHub, blogs with source links |
 | **Quick Start** | Copy-paste setup commands |
 
-Every section includes interactive elements — quizzes, animated conversations, flow diagrams — not just walls of text. Generated guides can be **deployed to a live URL via Vercel** or **exported to PDF** with the included scripts.
+Every section includes interactive elements — quizzes, animated conversations, flow diagrams. Guides can be **deployed to a live URL via Vercel** or **exported to PDF** with the included scripts.
+
+### Mode B — Markdown Technical Deep-Dive (new)
+
+For engineers studying a project's architecture / tech stack to learn from it. Output: a single Markdown file with Obsidian frontmatter, callouts, Mermaid diagrams. Saves directly into an Obsidian vault or any specified path.
+
+```
+/github-guide https://github.com/user/repo
+分析这个项目，存到 obsidian://open?vault=...&file=...
+```
+
+Triggered when the user provides an `obsidian://` URL, asks for "技术路径分析 / 源码分析 / 深度分析 / save as Markdown", or specifies a `.md` output path. Structure: TL;DR → quick facts → problem mapping → **core technical decision** → code map → **2-4 commands traced end-to-end** → safety design → build & dist → dependency analysis → **lessons to borrow** → references → one-line takeaway.
+
+Mode B skips quizzes, chat animations, and use-case storytelling (audience already knows what the project does). It uses jargon freely (the reader is an engineer). It digs into the source code, names file paths, and has opinions about which design choices are smart vs. debatable. Full spec in [`references/markdown-deep-dive.md`](references/markdown-deep-dive.md).
 
 ## Examples
+
+**Mode A (HTML)**:
 
 | Repo | Guide |
 |------|-------|
@@ -41,6 +55,8 @@ Every section includes interactive elements — quizzes, animated conversations,
 | [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) | [karpathy-skills-guide.html](examples/karpathy-skills-guide.html) |
 
 > Download the HTML file and open it in your browser — everything is self-contained.
+
+**Mode B (Markdown deep-dive)**: produced live into the user's Obsidian vault, not bundled here. The canonical structure is documented in [`references/markdown-deep-dive.md`](references/markdown-deep-dive.md), with a worked example analyzing [tw93/Mole](https://github.com/tw93/Mole) (Mac cleanup tool — Shell+Go hybrid architecture, 614 lines, 11 sections covering core technical decision, code map, command-level path tracing, safety design, dependency analysis, and reusable patterns).
 
 ## Install
 
@@ -60,22 +76,30 @@ git clone https://github.com/AlineFan/github-guide.git ~/.claude/skills/github-g
 
 ## Usage
 
+### Default — Mode A (HTML for beginners)
+
 ```
 /github-guide https://github.com/user/repo
 ```
 
-Or just describe what you want:
+Or describe what you want:
 
 ```
 /github-guide help me understand this repo: https://github.com/anthropics/claude-code
 ```
 
-The skill will:
+The skill will: **research** (README + structure + GitHub stats) → **find use cases** (X/Twitter/Reddit/HN/blogs with verified engagement) → **find alternatives** for the comparison module → **generate** a single HTML file.
 
-1. **Research** — read the README, scan repo structure, check GitHub stats
-2. **Find use cases** — search X/Twitter, Reddit, HN, blogs for verified real-world usage
-3. **Find alternatives** — identify competing projects for the comparison section
-4. **Generate** — output a single HTML file with all interactive elements
+### Mode B (Markdown for engineers)
+
+Include an Obsidian URL, a `.md` path, or a phrase like "技术路径分析 / 深度分析 / save as Markdown":
+
+```
+/github-guide https://github.com/user/repo
+分析这个项目，存到 obsidian://open?vault=Notes&file=tech%2Frepo-analysis
+```
+
+The skill will: **clone the repo** (`gh repo clone <repo> /tmp/...`) → **read the entry point + build config + key source files** → **trace 2-4 commands end-to-end** → **catalog dependencies with why-chosen reasoning** → **write the Markdown file** to your Obsidian vault path (or wherever you specified). No use-case search, no theme picking — focus on the code.
 
 ## Design Principles
 
@@ -168,19 +192,21 @@ The export script auto-detects github-guide format (looks for `<section>` elemen
 
 ```
 github-guide/
-├── SKILL.md                          # Skill definition + Page Structure
+├── SKILL.md                          # Skill definition + Mode A page structure + Mode B spec
 ├── references/
-│   ├── design-system.md              # Shared design tokens (Warm Editorial defaults)
-│   ├── themes.md                     # 4 visual theme presets
-│   ├── interactive-elements.md       # DOM-based primitives (chat / flow / quiz / ...)
-│   ├── svg-charts.md                 # SVG charts (radar / sparkline / tree / mindmap)
-│   └── animation-effects.md          # Hero bg + count-up + parallax + path draw-in
+│   ├── design-system.md              # Shared design tokens (Mode A)
+│   ├── themes.md                     # 4 visual theme presets (Mode A)
+│   ├── interactive-elements.md       # DOM-based primitives (Mode A: chat / flow / quiz)
+│   ├── svg-charts.md                 # SVG charts (Mode A: radar / sparkline / tree / mindmap)
+│   ├── animation-effects.md          # Hero bg + count-up + parallax + path draw-in (Mode A)
+│   └── markdown-deep-dive.md         # Mode B template — Obsidian frontmatter, callouts, Mermaid,
+│                                     # section-by-section template, tone calibration
 ├── scripts/
-│   ├── deploy.sh                     # Vercel deployment
-│   └── export-pdf.sh                 # Multi-page PDF export
+│   ├── deploy.sh                     # Vercel deployment (Mode A only)
+│   └── export-pdf.sh                 # Multi-page PDF export (Mode A only)
 └── examples/
-    ├── gbrain-guide-v2.html          # Example: garrytan/gbrain
-    └── karpathy-skills-guide.html    # Example: andrej-karpathy-skills
+    ├── gbrain-guide-v2.html          # Mode A example: garrytan/gbrain
+    └── karpathy-skills-guide.html    # Mode A example: andrej-karpathy-skills
 ```
 
 ## Requirements

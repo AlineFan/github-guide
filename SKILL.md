@@ -1,6 +1,6 @@
 ---
 name: github-guide
-description: "Turn any GitHub repository into a beginner-friendly interactive HTML guide page with flow diagrams, mind maps, quizzes, real use cases, and comparison charts. Use this skill whenever someone wants to understand a GitHub repo, create a guide for a repo, explain a project to beginners, analyze an open-source tool, or make a 'how it works' page. Also trigger when users say 'explain this repo', 'make a guide for this GitHub project', 'help me understand this tool', 'create an intro page for this repo', 'what does this repo do', or share a GitHub URL and ask for an explanation or guide. The output is a single self-contained HTML file with warm design, scroll-based navigation, animated diagrams, interactive quizzes, and verified real-world use cases."
+description: "Explain any GitHub repository in one of two output modes. Mode A — turn the repo into a beginner-friendly interactive HTML guide page with flow diagrams, mind maps, quizzes, real use cases, and SVG comparison charts (radar/sparkline/decision tree). Trigger when someone wants to understand a GitHub repo, create a beginner guide, explain a project to non-tech readers, make a 'how it works' page, or says 'explain this repo / make a guide / help me understand this tool / 小白指南'. Mode B — turn the repo into a Markdown technical deep-dive saved to Obsidian or a specified .md path, with frontmatter, Mermaid diagrams, code map, command-level path tracing, dependency analysis, and reusable patterns. Trigger when someone provides an obsidian:// URL, says '技术路径分析 / 源码分析 / 架构分析 / 深度分析 / save as Markdown / 存到 obsidian', or specifies a .md output path. Both modes share the research phase (README, repo structure, GitHub stats); Mode A adds use-case search and theme selection, Mode B adds source-code reading and dependency cataloging."
 ---
 
 # GitHub Guide
@@ -15,6 +15,35 @@ Before starting, ask the user:
 
 If the user's message is in English, default to English without asking.
 If the user's message is in Chinese, default to Chinese without asking.
+
+## Mode Detection (detect BEFORE planning Page Structure)
+
+There are two output modes — pick the right one by reading the user's request:
+
+### Mode A: HTML Beginner Guide (default)
+
+**Audience**: non-technical person or developer evaluating whether to adopt this tool.
+**Output**: single self-contained HTML file (with theme, SVG charts, animations, quizzes).
+**Tone**: warm mentor explaining to a smart friend — every jargon term gets a plain-language replacement (Principles 1, 8, Plain-Language Pass apply rigorously).
+**When to pick**: default, OR user says "make a guide", "explain this repo", "create a beginner guide", "小白指南", "帮我理解这个项目", etc.
+
+### Mode B: Markdown Technical Deep-Dive
+
+**Audience**: engineer studying the project's architecture / tech stack to learn from it.
+**Output**: a single Markdown file (.md), typically saved into an Obsidian vault or notes directory. Uses Obsidian-flavored Markdown (YAML frontmatter, `> [!callout]` blocks, Mermaid diagrams).
+**Tone**: peer-to-peer engineer talking to engineer. **Jargon is allowed and expected** (audience already knows what "singleflight", "OAuth", "TUI" mean). Plain-Language Pass is **relaxed** — explain terms only when the project uses an unusual one. No quizzes, no chat animations, no use-case storytelling.
+**When to pick**:
+- User provides an Obsidian URL (`obsidian://open?vault=...&file=...`) → save the .md there
+- User says "save to Obsidian", "save as Markdown", "存到 obsidian", ".md format"
+- User says "technical deep dive", "技术路径分析", "源码分析", "架构分析", "深度分析", "研究这个项目"
+- User provides a file path ending in `.md`
+- User mentions a notes / vault directory
+
+If ambiguous, ask with `AskUserQuestion` — one question, 2 options (Mode A / Mode B) with descriptions.
+
+**Mode B uses a different page structure** — see [§ Mode B Page Structure](#mode-b-page-structure) below. The Research Phase (Steps 1-4) is shared; Step 5 (theme) is Mode A only.
+
+The bulk of this SKILL.md below specifies Mode A. Mode B is specified in a dedicated section near the end, with a detailed template in [references/markdown-deep-dive.md](references/markdown-deep-dive.md).
 
 ## First-Run Welcome
 
@@ -310,6 +339,8 @@ Before generating HTML, decide which of the 4 themes fits the repo. Read [refere
 **Pick by what the repo *is*, not personal preference.** A doc tool in Terminal IDE feels wrong; a CLI in Paper & Ink feels precious. If genuinely unclear, ask the user via `AskUserQuestion` before generating.
 
 ## Page Structure
+
+**This section applies to Mode A (HTML Beginner Guide) only.** For Mode B (Markdown Technical Deep-Dive), see [§ Mode B](#mode-b-markdown-technical-deep-dive) below.
 
 The HTML guide follows this exact module structure:
 
@@ -629,3 +660,97 @@ Before delivering the HTML file, verify:
 - [ ] **Nav dots count matches section count**
 - [ ] Page is responsive and works on mobile (chart fallbacks kick in ≤600px)
 - [ ] Single self-contained HTML file (only external dep: Google Fonts CDN)
+
+---
+
+## Mode B: Markdown Technical Deep-Dive
+
+> The bulk of the spec above is for Mode A. Below is the Mode B counterpart — different audience, different output, different structure. The **Research Phase is shared with Mode A** (read README, find use cases, find alternatives) but with a different emphasis: dig into the codebase for technical decisions instead of finding social proof.
+
+### When Mode B applies
+
+See [§ Mode Detection](#mode-detection-detect-before-planning-page-structure) for the trigger phrases. The summary:
+
+- User provides an Obsidian URL → save the `.md` to the exact path encoded in the URL
+- User wants technical depth, source analysis, architecture deep-dive
+- User asks for `.md` output instead of HTML
+
+### Mode B research adjustments
+
+In addition to the standard Research Phase, do extra digging:
+
+1. **Clone the repo**: `gh repo clone owner/repo /tmp/<name>` so you can read the actual source
+2. **Map the entry point**: find the executable / `main()` / `bin/` directory
+3. **Read the build config**: `Makefile` / `package.json` / `Cargo.toml` / `go.mod` etc.
+4. **Identify hot files**: largest source files, files with most recent activity, files that source/import others
+5. **Trace 2-4 key commands or features end-to-end**: from user input → which file → which function → which output
+6. **Catalog the dependencies**: list each major dependency and explain WHY it was chosen (alternatives, tradeoffs)
+7. **Note safety / boundary design**: how the project handles destructive operations, errors, user data
+
+You can skip the X/Twitter / Reddit / HN use-case search (Mode A only). Focus the research budget on code-level understanding.
+
+### Mode B page structure
+
+Read [references/markdown-deep-dive.md](references/markdown-deep-dive.md) for the full template with frontmatter, Obsidian callout syntax, Mermaid examples, and section-by-section content templates.
+
+The standard outline (adapt to the specific project):
+
+1. **YAML frontmatter** — repo URL, stars, language ratio, license, maintainer, tags, created date
+2. **H1 title** + 1-sentence positioning callout
+3. **TL;DR** — 4-6 bullets summarizing the project's core decisions
+4. **基本信息速览 / Quick Facts** — table of stats
+5. **它解决什么问题 / What it solves** — usually with a Mermaid diagram showing the problem-solution mapping
+6. **核心技术决策 / Core technical decision** — the most important architectural choice, why this not alternatives
+7. **代码地图 / Code map** — directory structure with annotations
+8. **关键技术路径深度拆解 / Key technical paths** — 2-4 commands / features traced end-to-end with text-based flow diagrams
+9. **安全 / 边界设计 / Safety design** — if applicable (destructive ops, security model, error handling)
+10. **构建与分发 / Build & distribution** — Makefile / install script / release strategy
+11. **依赖技术栈剖析 / Dependency analysis** — each major dep, why chosen, what it provides
+12. **可借鉴的设计 / Lessons to borrow** — 5-10 concrete patterns the reader can reuse, including at least one cautionary (`⚠️`) item
+13. **参考链接 / References** — repo, homepage, key dependencies, author profile
+14. **一句话总结 / One-line takeaway**
+
+The exact section numbering and Chinese/English wording adapts to the project + user's language preference, but the **rhythm** is: stats → problem → architecture → code → paths → safety → build → deps → lessons → links.
+
+### Mode B tone
+
+- Write for an engineer who's already read the README and wants the next layer of depth
+- Jargon is welcome — don't replace "singleflight" with "防止并发重复调用的原语" (audience already knows)
+- Be specific: file paths, function names, line refs when meaningful
+- Have opinions: which choices are smart, which are debatable, which are limitations
+- The reader is studying for their own future projects — explicitly call out reusable patterns in the "可借鉴的设计" section
+
+### Mode B output format
+
+- Single `.md` file
+- Obsidian-flavored Markdown:
+  - YAML frontmatter
+  - Callout blocks: `> [!info]`, `> [!tip]`, `> [!warning]`, `> [!note]`, `> [!danger]`
+  - Mermaid diagrams in fenced ` ```mermaid ` blocks
+  - Tables, code blocks with language tag
+  - Internal links `[[wiki-link]]` only if the user's vault has related notes (otherwise use regular Markdown links)
+- Save the file to the user's specified location. **If they gave an `obsidian://` URL, decode it:**
+  - `vault=Obsidian%20Vault` → vault directory name
+  - `file=path%2Fto%2Ffile` → file path within vault (URL-decoded, `.md` extension added if missing)
+  - Find the vault root on disk (typically `~/Documents/<vault>` or `~/本地文稿/<vault>` or `~/<vault>`)
+  - Use `find ~/Documents ~/Library ~/Downloads ~/本地文稿 ~ -maxdepth 4 -type d -name "<vault>"` if unsure
+- Verify with `wc -l` after writing — confirm the file was created and isn't 0 bytes
+
+### Mode B quality checklist
+
+- [ ] **Frontmatter is valid YAML** — parseable, has at minimum `title`, `repo`, `tags`, `created_at`
+- [ ] **TL;DR exists** and is genuinely a TL;DR (4-6 bullets, not 20)
+- [ ] **Core technical decision section is non-trivial** — explains a real architectural choice with "why not alternative X" reasoning, not just describes what the code is
+- [ ] **At least one Mermaid diagram** — usually the architecture or problem-solution mapping
+- [ ] **At least 2 commands / features traced end-to-end** — file paths, function names, real flow
+- [ ] **Dependency analysis names each major dep + why-chosen reasoning** — not just a list
+- [ ] **可借鉴的设计 has 5-10 concrete patterns**, with at least one cautionary item (`⚠️`)
+- [ ] **References section has working URLs** — repo, key deps, author profile
+- [ ] **Saved to the user's specified path** — verified with `ls` / `wc -l`
+- [ ] **Plain-Language Pass is RELAXED for Mode B** — jargon is allowed (audience is technical); only explain unusual project-specific terms
+- [ ] **Token honesty (Principle 6a) still applies** — don't claim "零 token" or similar in any explanation
+- [ ] **Honest comparisons (Principle 4) still apply** — if mentioning alternatives, name real ones with real tradeoffs
+
+### Mode B example
+
+See the canonical example: **`mac清理工具 mole分析.md`** — a deep-dive on [tw93/Mole](https://github.com/tw93/Mole) using all the Mode B conventions (Obsidian frontmatter, Mermaid, callouts, 11 sections covering architecture / code map / technical paths / safety / build / deps / lessons).
