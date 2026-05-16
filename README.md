@@ -22,16 +22,16 @@ Get back a **single HTML file** (no build step, no dependencies) containing:
 
 | Module | Content |
 |--------|---------|
-| **Hero** | Project name, stats (stars/forks), one-line description |
+| **Hero** | Name, stats with count-up animation, **SVG sparkline** showing GitHub stars trend |
 | **Why It Exists** | Problem explained in everyday language + chat animation |
 | **How It Works** | Step-by-step flow animation + data journey diagram |
-| **Architecture** | Mind map with beginner-friendly labels |
-| **Comparison** | Table + decision flow chart ("which tool should I pick?") |
-| **Before → After** | User experience before vs after using the project + "Who needs this?" |
+| **Architecture** | **Radial SVG mind map** with hover-highlighting spokes (6 branches) |
+| **Comparison** | **5-dim SVG radar chart** + table + **clickable SVG decision tree** with path-highlighting |
+| **Before → After** | User experience before vs after + "Who needs this?" |
 | **Real Use Cases** | Verified cases from X/Twitter, GitHub, blogs with source links |
 | **Quick Start** | Copy-paste setup commands |
 
-Every section includes interactive elements — quizzes, animated conversations, flow diagrams — not just walls of text.
+Every section includes interactive elements — quizzes, animated conversations, flow diagrams — not just walls of text. Generated guides can be **deployed to a live URL via Vercel** or **exported to PDF** with the included scripts.
 
 ## Examples
 
@@ -105,18 +105,20 @@ The comparison section only includes projects that solve **the same problem dire
 
 ## Design System
 
-The generated pages use a warm, readable design:
+The skill ships **4 visual themes** — the generator picks one based on what the repo *is*, not personal preference:
 
-- **Fonts**: Bricolage Grotesque (headings) · DM Sans (body) · JetBrains Mono (code)
-- **Colors**: Teal accent `#2A7B9B` · Warm off-white `#FAF7F2` · Dark text `#2C2A28`
-- **Layout**: 800px content width, scroll-snap sections, responsive
-- **Animations**: Scroll-triggered fade-in via IntersectionObserver
+| Theme | When to use | Fonts | Accent |
+|---|---|---|---|
+| **Warm Editorial** (default) | Mixed audience, friendly tone | Bricolage Grotesque + DM Sans | Teal `#2A7B9B` |
+| **Terminal IDE** | Dev tool, CLI, hacker aesthetic | JetBrains Mono + Inter | Terminal green `#39D353` |
+| **Electric Studio** | AI/ML/SaaS, enterprise feel | Manrope + IBM Plex Sans | Electric blue `#4361EE` |
+| **Paper & Ink** | Docs, knowledge base, literary | Cormorant + Source Serif 4 | Crimson `#C41E3A` |
 
-Full design tokens in [`references/design-system.md`](references/design-system.md).
+All themes share the same component CSS — only the design tokens differ. Full specs in [`references/themes.md`](references/themes.md).
 
 ## Interactive Elements
 
-9 reusable patterns with complete HTML/CSS/JS:
+### DOM primitives ([`references/interactive-elements.md`](references/interactive-elements.md))
 
 | Element | Purpose |
 |---------|---------|
@@ -124,22 +126,58 @@ Full design tokens in [`references/design-system.md`](references/design-system.m
 | Flow Animation | Step-by-step data flow walkthrough |
 | Data Journey | Vertical diagram of a complete scenario |
 | Quiz | Multiple choice with instant feedback |
-| Decision Flow | Nested branching "which tool?" chart |
+| Decision Flow | Nested branching chart (mobile fallback) |
 | Glossary Tooltip | Hover to reveal term definitions |
-| Mind Map | Architecture overview with 6 branches |
+| Mind Map Grid | 3×2 cards (mobile fallback) |
+| Before/After Cards | User experience change comparison |
+| Workflow Steps | Numbered steps with tool badges + mock outputs |
+| Concept Comparison | Analogy-based callouts for abstract distinctions |
 | Source Badges | Colored labels linking to original posts |
 | Navigation | Progress bar + dot navigation + keyboard arrows |
 
-Full patterns in [`references/interactive-elements.md`](references/interactive-elements.md).
+### SVG charts ([`references/svg-charts.md`](references/svg-charts.md))
+
+| Chart | Where it appears |
+|---|---|
+| **Radar chart** | Module 4 — multi-dimensional competitor comparison |
+| **Sparkline** | Hero — GitHub stars growth with milestone markers |
+| **Decision Tree** | Module 4 — clickable, path-highlighting |
+| **Radial Mind Map** | Module 3 — center + 6 spokes, hover-highlights |
+
+Each SVG chart has a mobile fallback to its DOM equivalent (≤600px).
+
+### Animation effects ([`references/animation-effects.md`](references/animation-effects.md))
+
+Per-theme hero backgrounds (mesh gradient / scan lines / two-panel / paper grain), count-up number animation, SVG path draw-in, parallax-lite, scroll-linked module number indicator, `prefers-reduced-motion` enforcement.
+
+## Share & Export
+
+After generation, the skill offers two optional deliveries:
+
+```bash
+# Deploy to a live URL (Vercel)
+bash scripts/deploy.sh path/to/guide.html
+
+# Export to PDF (Playwright)
+bash scripts/export-pdf.sh path/to/guide.html
+```
+
+The export script auto-detects github-guide format (looks for `<section>` elements) and disables scroll-snap before screenshotting each module at 1920×1080.
 
 ## File Structure
 
 ```
 github-guide/
-├── SKILL.md                          # Skill definition
+├── SKILL.md                          # Skill definition + Page Structure
 ├── references/
-│   ├── design-system.md              # Design tokens & CSS variables
-│   └── interactive-elements.md       # 9 interactive component patterns
+│   ├── design-system.md              # Shared design tokens (Warm Editorial defaults)
+│   ├── themes.md                     # 4 visual theme presets
+│   ├── interactive-elements.md       # DOM-based primitives (chat / flow / quiz / ...)
+│   ├── svg-charts.md                 # SVG charts (radar / sparkline / tree / mindmap)
+│   └── animation-effects.md          # Hero bg + count-up + parallax + path draw-in
+├── scripts/
+│   ├── deploy.sh                     # Vercel deployment
+│   └── export-pdf.sh                 # Multi-page PDF export
 └── examples/
     ├── gbrain-guide-v2.html          # Example: garrytan/gbrain
     └── karpathy-skills-guide.html    # Example: andrej-karpathy-skills

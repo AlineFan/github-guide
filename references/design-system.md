@@ -178,6 +178,21 @@ document.querySelectorAll('.stagger-children').forEach(parent => {
 .ba-card--after  .ba-label { color: #16A34A; }
 ```
 
+## Workflow Step Tool Badges
+
+```css
+/* Base badge */
+.workflow-tool-badge {
+  display: inline-block; padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+}
+/* Per-tool colors — extend as needed */
+.workflow-tool-badge.opencli    { background: var(--color-accent-light); color: var(--color-accent); }
+.workflow-tool-badge.last30days { background: #F3E8FF; color: #7B6DAA; }
+.workflow-tool-badge.claude     { background: var(--color-info-light); color: #B8860B; }
+```
+
 ## Footer
 
 Footer must be **inside the last `<section>`** to avoid scroll-snap bounce. Use `.footer-inner` class.
