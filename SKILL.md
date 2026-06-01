@@ -460,30 +460,27 @@ Organized into 3 groups, each with a labeled header:
 
 **CRITICAL**: Footer HTML must be placed **inside** the last `<section>` element, not after `</main>`. Outside placement triggers scroll-snap bounce.
 
-Use this exact structure — every guide gets the same skill-author attribution + repo link + license + version:
+Use this exact structure — every guide gets the same creator attribution (林锵锵 · 小红书 · X) and a "Built with github-guide" link, plus the guided project's name + license:
 
 ```html
 <div class="footer-inner">
   <p>Interactive guide generated with ⚡</p>
   <div class="footer-links">
-    <span>Skill Author: <a href="https://github.com/AlineFan" target="_blank">@AlineFan</a></span>
+    <span>Created by <strong style="color:var(--color-accent-muted)">林锵锵</strong> · <a href="https://www.xiaohongshu.com/user/profile/66e3e0f8000000000b031363" target="_blank" rel="noopener">小红书 ↗</a> · <a href="https://x.com/ylf1797721" target="_blank" rel="noopener">X ↗</a></span>
     <span class="footer-sep">·</span>
-    <span>Source: <a href="REPO_URL" target="_blank">GitHub</a></span>
+    <span>Built with <a href="https://github.com/AlineFan/github-guide" target="_blank" rel="noopener">github-guide ↗</a></span>
     <span class="footer-sep">·</span>
-    <span>License: LICENSE_NAME</span>
-    <span class="footer-sep">·</span>
-    <span>VERSION_TAG（RELEASE_DATE）</span>
+    <span>讲解对象 <a href="REPO_URL" target="_blank" rel="noopener">REPO_NAME</a> · LICENSE_NAME</span>
   </div>
 </div>
 ```
 
-Fill in:
-- `REPO_URL` — the repo being guided (e.g. `https://github.com/larksuite/cli`)
+Fill in (only the last span is per-repo — the first two are fixed attribution, never change them):
+- `REPO_URL` — the repo being guided (e.g. `https://github.com/jackwener/OpenCLI`)
+- `REPO_NAME` — the guided repo's short display name (e.g. `OpenCLI`)
 - `LICENSE_NAME` — from `gh repo view ... --json licenseInfo` (e.g. `MIT`, `Apache 2.0`)
-- `VERSION_TAG` — latest release tag from `gh repo view ... --json latestRelease` (e.g. `v1.0.32`)
-- `RELEASE_DATE` — `publishedAt` from same query (e.g. `2026-05-15`)
 
-The Skill Author link to **@AlineFan** is the github-guide skill's own author attribution — keep it on every generated guide.
+The **Created by 林锵锵** (小红书 + X) and **Built with github-guide** spans are the skill's fixed attribution — keep them identical, with these exact links, on every generated guide. Only the `讲解对象` span (guided project name + license) changes per repo.
 
 ## Design System & Visual Theme
 
@@ -656,7 +653,7 @@ Before delivering the HTML file, verify:
 
 **Technical:**
 - [ ] **Footer is inside the last `<section>`** (not after `</main>`)
-- [ ] **Footer has all 4 spans**: Skill Author (`@AlineFan` link) / Source (repo link) / License / Version (tag + date)
+- [ ] **Footer has the 3 attribution spans**: Created by 林锵锵 (小红书 + X links) / Built with github-guide (repo link) / 讲解对象 {project name} · {license} — first two fixed, last is per-repo
 - [ ] **Nav dots count matches section count**
 - [ ] Page is responsive and works on mobile (chart fallbacks kick in ≤600px)
 - [ ] Single self-contained HTML file (only external dep: Google Fonts CDN)

@@ -671,20 +671,18 @@ Explains abstract technical distinctions using everyday analogies. Place at the 
 <div class="footer-inner">
   <p>Interactive guide generated with ⚡</p>
   <div class="footer-links">
-    <span>Skill Author: <a href="https://github.com/AlineFan" target="_blank">@AlineFan</a></span>
+    <span>Created by <strong style="color:var(--color-accent-muted)">林锵锵</strong> · <a href="https://www.xiaohongshu.com/user/profile/66e3e0f8000000000b031363" target="_blank" rel="noopener">小红书 ↗</a> · <a href="https://x.com/ylf1797721" target="_blank" rel="noopener">X ↗</a></span>
     <span class="footer-sep">·</span>
-    <span>Source: <a href="REPO_URL" target="_blank">GitHub</a></span>
+    <span>Built with <a href="https://github.com/AlineFan/github-guide" target="_blank" rel="noopener">github-guide ↗</a></span>
     <span class="footer-sep">·</span>
-    <span>License: LICENSE_NAME</span>
-    <span class="footer-sep">·</span>
-    <span>VERSION_TAG（RELEASE_DATE）</span>
+    <span>讲解对象 <a href="REPO_URL" target="_blank" rel="noopener">REPO_NAME</a> · LICENSE_NAME</span>
   </div>
 </div>
 ```
 
-**Always include all four spans**: Skill Author / Source / License / Version. Pull license + version from `gh repo view <repo> --json licenseInfo,latestRelease`.
+**Always include all three spans**: Created by 林锵锵 (小红书 + X) / Built with github-guide / 讲解对象 {project name} · {license}. Pull the guided project's license from `gh repo view <repo> --json licenseInfo`.
 
-The Skill Author link to `@AlineFan` is the github-guide skill's own attribution — keep it identical on every generated guide.
+The **Created by 林锵锵** (小红书 + X) and **Built with github-guide** spans are the skill's fixed attribution — keep them identical, with these exact links, on every generated guide. Only the `讲解对象` span changes per repo.
 
 ### CSS
 ```css
