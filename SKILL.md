@@ -1,6 +1,6 @@
 ---
 name: github-guide
-description: "Explain any GitHub repository in one of two output modes. Mode A — turn the repo into a beginner-friendly interactive HTML guide page with flow diagrams, mind maps, quizzes, real use cases, and SVG comparison charts (radar/sparkline/decision tree). Trigger when someone wants to understand a GitHub repo, create a beginner guide, explain a project to non-tech readers, make a 'how it works' page, or says 'explain this repo / make a guide / help me understand this tool / 小白指南'. Mode B — turn the repo into a Markdown technical deep-dive saved to Obsidian or a specified .md path, with frontmatter, Mermaid diagrams, code map, command-level path tracing, dependency analysis, and reusable patterns. Trigger when someone provides an obsidian:// URL, says '技术路径分析 / 源码分析 / 架构分析 / 深度分析 / save as Markdown / 存到 obsidian', or specifies a .md output path. Both modes share the research phase (README, repo structure, GitHub stats); Mode A adds use-case search and theme selection, Mode B adds source-code reading and dependency cataloging."
+description: "Explain any GitHub repository in one of two output modes. Mode A — turn the repo into a beginner-friendly interactive HTML guide page with flow diagrams, mind maps, quizzes, real use cases, SVG comparison charts (radar/sparkline/decision tree), and a solution-landscape map of how the whole field tackles this problem. Calibrates explanation depth to the reader's level (ELI5 / ELI14 / intern) without ever dropping modules. Trigger when someone wants to understand a GitHub repo, create a beginner guide, explain a project to non-tech readers, make a 'how it works' page, or says 'explain this repo / make a guide / help me understand this tool / 小白指南'. Mode B — turn the repo into a Markdown technical deep-dive saved to Obsidian or a specified .md path, with frontmatter, Mermaid diagrams, code map, command-level path tracing, dependency analysis, and reusable patterns. Trigger when someone provides an obsidian:// URL, says '技术路径分析 / 源码分析 / 架构分析 / 深度分析 / save as Markdown / 存到 obsidian', or specifies a .md output path. Both modes share the research phase (README, repo structure, GitHub stats); Mode A adds use-case search and theme selection, Mode B adds source-code reading and dependency cataloging."
 ---
 
 # GitHub Guide
@@ -71,6 +71,40 @@ The target reader is a **non-technical person** or a developer **evaluating whet
 - See how it compares to alternatives (and decide if it's right for them)
 - Learn from real user experiences (not marketing copy)
 - Get started with the simplest possible setup steps
+
+## Reader Calibration — Ask Before Generating (Mode A)
+
+"小白指南" is not one fixed level — it means *meeting this reader where they are*. Two people both call themselves beginners: one has never opened a terminal, the other ships code daily but has never seen this particular domain. The same guide can't serve both well unless you calibrate first.
+
+So **after confirming language and detecting Mode A, but before the Research Phase, ask the reader two quick things** (use `AskUserQuestion`; skip a question if their message already answers it):
+
+1. **How familiar are you with this kind of project / this domain already?** — tells you how much background to fill in.
+2. **What explanation depth do you want?** — offer three named levels (borrowed from how people actually ask):
+   - **ELI5 — 当我完全是小白**: assume zero background. Every concept is built up from an everyday analogy *before* any term appears.
+   - **ELI14 — 我有点基础**: assume general computer literacy. Explain domain-specific and project-specific ideas; skip true basics.
+   - **Intern (ELII) — 像带实习生**: assume they know the fundamentals and can read code, but are new to *this* tool/domain. Be compact; spend words on the non-obvious.
+
+**Better still, have them restate their understanding first.** When the reader is learning for themselves (not generating for a third party), invite them to say in one or two sentences what they currently think the project does — *"用一两句话说说你现在以为它是干嘛的，或者你卡在哪。"* Their answer reveals their real level far better than a self-selected label, and shows you exactly which gaps to fill. Then build the guide up from where they actually are — *"make sure she understands why (drill into more whys), what, and how; understanding the problem well is imperative."*
+
+If level is genuinely unknown and the reader doesn't answer, **default to ELI14** — the middle that neither condescends to those with some background nor loses true beginners (true beginners can still follow, because every term is still defined per Principle 1).
+
+### The Iron Rule: depth changes the *wording*, never the *modules*
+
+> Level only changes **how** things are explained — the analogies, how far you drill into the "why", how much prior knowledge you assume, whether code is line-commented. It must **never** delete a module, a chart, a quiz, or a use case.
+
+Every level ships the **same skeleton** — Hero → Why → How → Architecture → Solution Landscape → Comparison → Before/After → Use Cases → Quick Start. What shifts between levels is only the prose:
+
+| | ELI5 (完全小白) | ELI14 (有点基础) | Intern (实习生) |
+|---|---|---|---|
+| New term first appears | everyday analogy first, term named after | one-line plain definition + tooltip | tooltip only; assume recognition |
+| "Why does this exist" | drill 3-4 whys, from the human problem | drill 2 whys | state the core why, move on |
+| Analogy density | every abstract concept gets one | key concepts only | sparingly, for genuinely tricky ideas |
+| Architecture node labels | "what this means for you" sentence on each | short benefit phrase | technical label + one-line gloss |
+| Quick-Start code | every line plain-language commented | key lines commented | shown as-is with a summary |
+
+**If you ever think "this reader is a beginner, so I'll cut the architecture section" — stop. That is the one move this rule forbids.** Beginners need the architecture explained *more*, not removed.
+
+(Mode B is engineer-to-engineer by definition — skip this calibration there: assume intern-level-or-above and let jargon through, per the Mode B tone rules.)
 
 ## Core Principles
 
@@ -266,6 +300,24 @@ Common jargon to replace (expand this table for each new repo — every CLI / AP
 
 Same content, but every term is either explained or replaced with what the reader would say at dinner.
 
+### 9. Calibrate Depth to the Reader — But Never Cut Modules
+
+The guide adapts its *explanation depth* to the level set during [§ Reader Calibration](#reader-calibration--ask-before-generating-mode-a) — ELI5, ELI14, or intern. What adapts: analogy density, how far you drill into "why", how much prior knowledge you assume, whether code lines are commented.
+
+What **never** adapts: the module structure. Every level gets the full skeleton — Hero, Why, How, Architecture, Solution Landscape, Comparison, Before/After, Use Cases, Quick Start — with all charts and all quizzes. **Lowering the level means explaining *more* per concept, not showing *fewer* concepts.** Deleting the architecture diagram "because they're a beginner" is the exact mistake this principle exists to prevent — a beginner needs it explained more, not removed.
+
+Even in an intern-level guide, keep the plain-language fallback (Principle 1) reachable: a reader hitting one unfamiliar term should still find it defined, as if they'd quietly asked "ELI5 just this one."
+
+### 10. Teach the Why First, and Drill Into the Whys
+
+Understanding the *problem* matters more than memorizing the solution. Before explaining what the project does, make sure the reader feels **why the problem exists at all** — and don't stop at the first why:
+
+- **Why** does this problem happen? → because X.
+- **Why** is X painful? → because it costs Y.
+- **Why** can't existing tools just fix it? → because of trade-off Z.
+
+Only once the problem lands should you move to **what** the project does and **how** it works. A reader who deeply gets the problem will understand and remember the solution; a reader handed the solution first just memorizes it. This is why Module 1 (Why This Project Exists) precedes Module 2 (How It Works), and why Module 1 should drill 2-4 whys deep — depth set by reader level (Principle 9).
+
 ## Research Phase
 
 Before writing any HTML, gather information in this order:
@@ -302,14 +354,21 @@ Search for verified, high-engagement user testimonials. Use subagents for parall
 - Save the original URL for every case
 - If Reddit/HN have no results, honestly report that
 
-### Step 3: Find Alternatives
-Search for competing/similar projects. Cast a wide net — search GitHub, Reddit, HN, and the repo's own issues (users often mention alternatives). Don't rely solely on the README's "Related Projects" section.
+### Step 3: Map the Solution Landscape + Find Alternatives
 
-For each competitor, find:
+This feeds two *different* modules, so gather two different things and keep them distinct:
+
+**3a. The solution landscape — how the whole field tackles this problem (feeds Module 3.5).**
+Most problems have more than one *school of thought*, not just competing products. Identify the 2-4 broad **approaches / paradigms** people use to solve this class of problem, and which one this project belongs to. Example — for an "AI memory" project: some tools just append to a **document / flat file**, some do **semi-automatic** save-on-command, some use a **vector database** for similarity search, some build a **knowledge graph**. Those are different *philosophies*, not just different logos. For each approach note: the core idea (one analogy-ready sentence), one or two representative tools, what it's good at, what it costs. Search GitHub topics, "X vs Y" blog posts, Reddit/HN "how do you all handle <problem>" threads, and awesome-lists.
+
+**3b. Direct competitors — same-approach products to compare head-to-head (feeds Module 4).**
+Within this project's own approach, find the specific competing products. Cast a wide net — search GitHub, Reddit, HN, and the repo's own issues (users often mention alternatives). Don't rely solely on the README's "Related Projects" section. For each competitor, find:
 - GitHub repo URL and **stars count** (for credibility context)
 - **Language/framework** and **team background** (individual vs. university vs. company)
 - Core differentiator — what does it do better or worse?
 - Trade-offs vs. the main project
+
+3a is "what *kinds* of solutions exist" (the paradigm map → Module 3.5); 3b is "which specific products compete" (head-to-head → Module 4). Don't collapse them into one list.
 
 ### Step 4: Find Complementary Tools (If Available)
 
@@ -353,6 +412,7 @@ The HTML guide follows this exact module structure:
 
 ### Module 1: Why This Project Exists
 - Explain the problem in everyday language
+- **Drill into the "why"** (Principle 10) — don't just state the problem; peel it back 2-4 layers: why it happens → why that hurts → why existing tools don't already solve it. Depth scales with reader level (Principle 9). This is the load-bearing module: a reader who *feels* the problem will understand everything after it.
 - **Chat animation** simulating the problem (e.g., AI forgetting, manual workflow pain)
 - What this project does about it (3 feature cards with icons)
 - **Quiz #1** — test understanding of the core problem
@@ -368,6 +428,27 @@ The HTML guide follows this exact module structure:
 - Every branch has beginner-friendly title + "what this means for you" description
 - Callout box highlighting a key benefit
 - **Quiz #3** — test understanding of architecture
+
+### Module 3.5: How the Field Solves This Problem (Solution Landscape)
+
+Before comparing specific products (Module 4), zoom out and show the reader that this problem has **several schools of thought** — then mark where this project sits. This is the difference between "here are 3 competing apps" (Module 4) and "here are the fundamentally different *ways* people approach this, and why this project picked one" (this module).
+
+**Why it matters, especially for a beginner:** once they see the landscape, the project stops feeling arbitrary. *"哦——有的工具只是存成文档，有的用智能数据库，这个用知识图谱。现在我懂它为什么这样设计了。"* A reader who understands the option space understands the choice.
+
+**Content** (from Research Step 3a):
+- **2-4 approach cards**, one per paradigm. Each card carries:
+  - **Approach name** in plain language (e.g. "存成文档", "智能搜索库", "知识图谱", "随手记 + 半自动整理")
+  - **One-sentence essence** with an everyday analogy (Principle 7)
+  - **Representative tool(s)** with links — who actually uses this approach
+  - **Good at / Costs you** — the honest trade-off of the *approach itself*, not of one product
+  - A badge/highlight on the card **this project belongs to**
+- **A positioning line** right after the cards: name which approach this project chose and the one-sentence reason. This is the bridge into Module 4 ("within that approach, here's how it stacks up against direct rivals").
+
+**Visual** (pick one, scale wording to reader level):
+- **Approach-archetype cards** (DOM grid) — read [references/interactive-elements.md](references/interactive-elements.md) §15
+- A **spectrum / 2-axis positioning** layout when the approaches line up along a clear axis (manual ↔ automatic, lightweight ↔ powerful, local ↔ cloud) — place the project as a dot on the spectrum
+
+**How this differs from Module 4 (don't merge them):** Module 4 is a head-to-head of *installable competing products* and deliberately excludes DIY workarounds and built-in features (Principle 4). Module 3.5 is the *map of paradigms* — here a lightweight or DIY approach (e.g. "just keep a text file") legitimately appears as one school of thought, because the job is to orient the reader, not to crown a winner. Stay honest (Principle 4 spirit): show what each approach genuinely gives up.
 
 ### Module 4: Comparison with Alternatives
 - If comparing tools with fundamentally different approaches (e.g., CLI vs MCP, local vs cloud), add a **concept comparison callout** at the top with everyday analogy (see Principle #7)
@@ -511,6 +592,8 @@ Read these three references — they cover all visual components:
 - Before/After cards + Scenario tags
 - **Workflow steps** (numbered steps with tool badges, commands, mock outputs)
 - **Concept comparison callout** (analogy-based explanation of abstract distinctions)
+- **Approach-archetype cards** (Module 3.5 — the field's solution paradigms, with this project's marked)
+- **Layered concept explainer** (ELI5 / ELI14 / intern depth toggle for a hard concept — optional)
 - Navigation dots + progress bar
 
 ### `references/svg-charts.md` (graphical charts — upgrade from DOM primitives)
@@ -601,6 +684,9 @@ If you skip this pass and ship a guide that uses raw terms like "smart defaults 
 Before delivering the HTML file, verify:
 
 **Content accuracy:**
+- [ ] **Reader level calibrated** — depth (ELI5 / ELI14 / intern) was asked or inferred, and the prose matches it consistently throughout
+- [ ] **No module dropped for a lower level** — beginner guides keep the full skeleton (Why, How, Architecture, Landscape, Comparison, Before/After, Use Cases, Quick Start); level changed only the wording (Principle 9)
+- [ ] **Module 1 drills into the "why"** — peels the problem back 2-4 layers, not just states it (Principle 10)
 - [ ] Language consistent (all Chinese or all English, matching user's choice)
 - [ ] Professional tone — no hype words, no excessive emojis in body text
 - [ ] **Chat animation facts verified** — no false claims about AI tool capabilities; show trade-offs, not fake limitations
@@ -616,6 +702,7 @@ Before delivering the HTML file, verify:
 - [ ] All interactive elements (quizzes, flow, chat) work correctly
 
 **Comparison & use cases:**
+- [ ] **Solution Landscape (Module 3.5) present** — 2-4 field approaches/paradigms, each with essence + representative tool + honest trade-off, and this project's approach marked
 - [ ] All use cases are verified as being about THIS specific repo
 - [ ] All use cases have clickable source links
 - [ ] X/Twitter cases show engagement metrics (views, likes)
@@ -683,6 +770,7 @@ In addition to the standard Research Phase, do extra digging:
 5. **Trace 2-4 key commands or features end-to-end**: from user input → which file → which function → which output
 6. **Catalog the dependencies**: list each major dependency and explain WHY it was chosen (alternatives, tradeoffs)
 7. **Note safety / boundary design**: how the project handles destructive operations, errors, user data
+8. **Map the field's approaches**: identify the 2-4 paradigms used to solve this class of problem (e.g. for "AI memory": flat document vs. vector DB vs. knowledge graph vs. semi-automatic capture) and which one this project chose — this grounds the "core technical decision" section in the real alternative space, not just this repo's internals.
 
 You can skip the X/Twitter / Reddit / HN use-case search (Mode A only). Focus the research budget on code-level understanding.
 
@@ -697,7 +785,7 @@ The standard outline (adapt to the specific project):
 3. **TL;DR** — 4-6 bullets summarizing the project's core decisions
 4. **基本信息速览 / Quick Facts** — table of stats
 5. **它解决什么问题 / What it solves** — usually with a Mermaid diagram showing the problem-solution mapping
-6. **核心技术决策 / Core technical decision** — the most important architectural choice, why this not alternatives
+6. **核心技术决策 / Core technical decision** — the most important architectural choice, why this not alternatives. Open with a brief **landscape of approaches** (the 2-4 paradigms from research step 8) so the "why not alternatives" reasoning compares against the real field, not a strawman.
 7. **代码地图 / Code map** — directory structure with annotations
 8. **关键技术路径深度拆解 / Key technical paths** — 2-4 commands / features traced end-to-end with text-based flow diagrams
 9. **安全 / 边界设计 / Safety design** — if applicable (destructive ops, security model, error handling)

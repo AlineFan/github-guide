@@ -699,3 +699,156 @@ The **Created by 林锵锵** (小红书 + X) and **Built with github-guide** spa
   flex-wrap: wrap; justify-content: center; margin-top: var(--space-2);
 }
 ```
+
+---
+
+## 15. Approach-Archetype Cards (Solution Landscape)
+
+For **Module 3.5** — show the 2-4 *paradigms* the field uses to solve this problem (NOT specific competing products; those go in Module 4's radar/table). One card per approach; always mark the card this project uses.
+
+### HTML Structure
+```html
+<div class="approach-grid stagger-children">
+  <!-- One card per paradigm. Add class "approach-card--this" to the approach THIS project uses. -->
+  <div class="approach-card animate-in">
+    <div class="approach-head">
+      <span class="approach-icon">📄</span>
+      <h4 class="approach-name">存成文档</h4>
+    </div>
+    <p class="approach-essence">像把笔记记在一个本子上——简单直接，需要时自己翻。</p>
+    <div class="approach-tools">代表：<a href="https://github.com/owner/repo" target="_blank" rel="noopener">某工具 ↗</a></div>
+    <div class="approach-tradeoff">
+      <div class="approach-good"><span>✓ 好在</span>零门槛、完全可控、看得见</div>
+      <div class="approach-cost"><span>✗ 代价</span>本子一厚就难找，全靠人记得去翻</div>
+    </div>
+  </div>
+
+  <div class="approach-card approach-card--this animate-in">
+    <div class="approach-badge">这个项目走的就是这条路</div>
+    <div class="approach-head">
+      <span class="approach-icon">🕸️</span>
+      <h4 class="approach-name">知识图谱</h4>
+    </div>
+    <p class="approach-essence">像给笔记之间拉上线——问一件事，相关的会自己浮出来。</p>
+    <div class="approach-tools">代表：<a href="REPO_URL" target="_blank" rel="noopener">本项目 ↗</a></div>
+    <div class="approach-tradeoff">
+      <div class="approach-good"><span>✓ 好在</span>能顺藤摸瓜找到相关的内容</div>
+      <div class="approach-cost"><span>✗ 代价</span>前期得先把关系建起来</div>
+    </div>
+  </div>
+</div>
+
+<!-- Positioning line: the bridge into Module 4 -->
+<p class="approach-position animate-in">
+  本项目选了 <strong>知识图谱</strong> 这一派——因为它要解决的核心痛点是「记得多但找不到」。下面看看，同样走这条路的几个工具里，它表现如何。
+</p>
+```
+
+### CSS
+```css
+.approach-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-5); margin: var(--space-8) 0;
+}
+.approach-card {
+  position: relative; display: flex; flex-direction: column; gap: var(--space-3);
+  padding: var(--space-6); background: var(--color-surface);
+  border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-normal) var(--ease-out), box-shadow var(--duration-normal) var(--ease-out);
+}
+.approach-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+/* The approach THIS project uses — highlighted, never hidden */
+.approach-card--this { border-color: var(--color-accent); box-shadow: 0 0 0 2px var(--color-accent-light), var(--shadow-md); }
+.approach-badge {
+  position: absolute; top: calc(-1 * var(--space-3)); left: var(--space-5);
+  padding: 2px 10px; background: var(--color-accent); color: #fff;
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 600; border-radius: var(--radius-full);
+}
+.approach-head { display: flex; align-items: center; gap: var(--space-2); }
+.approach-icon { font-size: var(--text-2xl); }
+.approach-name { margin: 0; font-size: var(--text-lg); font-weight: 700; }
+.approach-essence { margin: 0; color: var(--color-text-secondary); font-size: var(--text-sm); line-height: 1.6; }
+.approach-tools { font-size: var(--text-xs); color: var(--color-text-muted); }
+.approach-tools a { color: var(--color-accent); text-decoration: none; }
+.approach-tradeoff { margin-top: auto; display: flex; flex-direction: column; gap: var(--space-2); font-size: var(--text-sm); }
+.approach-good span, .approach-cost span { font-weight: 600; margin-right: 6px; }
+.approach-good { color: var(--color-success); }
+.approach-cost { color: var(--color-error); }
+.approach-position { max-width: 60ch; margin: var(--space-6) auto 0; text-align: center; font-size: var(--text-base); line-height: 1.7; color: var(--color-text); }
+@media (max-width: 600px) { .approach-grid { grid-template-columns: 1fr; } }
+```
+
+### Notes
+- **Paradigms, not products.** Don't list 3 competing apps here — that's the radar chart in Module 4. List 2-4 *ways of thinking* (document / vector DB / knowledge graph / semi-automatic), each possibly represented by several tools.
+- **Always mark the project's own approach** with `--this` + the badge. The reader's takeaway: "this project belongs to *that* school — here's the trade-off it accepted."
+- Trade-offs describe the **approach**, not a single tool — e.g. "knowledge graphs need setup" is true of the paradigm, not just this repo.
+- A DIY/lightweight approach (e.g. "just a text file") is fair game here as a paradigm, even though Principle 4 bars it from the Module 4 *product* comparison.
+- Scale the essence/trade-off wording to reader level (Principle 9): ELI5 leans on the analogy, intern reads a tighter phrasing — but **keep all cards** either way.
+
+---
+
+## 16. Layered Concept Explainer (ELI5 / ELI14 / Intern)
+
+Optional enhancement for a genuinely hard core concept. Lets the reader flip the *same* idea between three depths — the on-page embodiment of "ask for ELI5 / ELI14 / intern" (see SKILL.md § Reader Calibration). The page's overall default depth is still set at generation time; this widget just lets a curious reader go deeper or simpler on one specific term.
+
+### HTML Structure
+```html
+<div class="depth-card" data-depth="14">
+  <div class="depth-card-head">
+    <span class="depth-term">什么是「向量数据库」？</span>
+    <div class="depth-tabs" role="tablist" aria-label="解释深度">
+      <button class="depth-tab" role="tab" data-level="5">🧒 小白</button>
+      <button class="depth-tab is-active" role="tab" data-level="14" aria-selected="true">🎓 有基础</button>
+      <button class="depth-tab" role="tab" data-level="intern">💼 实习生</button>
+    </div>
+  </div>
+  <div class="depth-body">
+    <p class="depth-pane" data-level="5">就像一个「按意思找」的盒子：你丢一句话进去，它能挑出"意思最接近"的其他句子——不用一字一字对上。</p>
+    <p class="depth-pane is-active" data-level="14">普通数据库按关键词精确匹配；向量数据库先把文字变成一串数字（坐标），再找坐标上"离得最近"的内容，所以能按语义找相似的东西。</p>
+    <p class="depth-pane" data-level="intern">文本经 embedding 模型编码成高维向量，按余弦相似度做近邻检索（ANN，如 HNSW）。换来语义召回，代价是要维护索引、调相似度阈值，且结果不是精确匹配。</p>
+  </div>
+</div>
+```
+
+### JS
+```js
+document.querySelectorAll('.depth-card').forEach(card => {
+  const tabs  = card.querySelectorAll('.depth-tab');
+  const panes = card.querySelectorAll('.depth-pane');
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    const level = tab.dataset.level;
+    tabs.forEach(t => { const on = t === tab; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', on); });
+    panes.forEach(p => p.classList.toggle('is-active', p.dataset.level === level));
+  }));
+});
+```
+
+### CSS
+```css
+.depth-card {
+  border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  background: var(--color-surface-warm); padding: var(--space-5) var(--space-6); margin: var(--space-6) 0;
+}
+.depth-card-head {
+  display: flex; flex-wrap: wrap; gap: var(--space-3);
+  align-items: center; justify-content: space-between; margin-bottom: var(--space-3);
+}
+.depth-term { font-weight: 700; font-size: var(--text-lg); }
+.depth-tabs { display: inline-flex; gap: 4px; background: var(--color-bg-warm); padding: 3px; border-radius: var(--radius-full); }
+.depth-tab {
+  border: 0; cursor: pointer; padding: 4px 12px; border-radius: var(--radius-full);
+  font-family: var(--font-mono); font-size: var(--text-xs); color: var(--color-text-secondary);
+  background: transparent; transition: background var(--duration-fast) var(--ease-out);
+}
+.depth-tab.is-active { background: var(--color-accent); color: #fff; }
+.depth-pane { display: none; margin: 0; line-height: 1.7; color: var(--color-text); }
+.depth-pane.is-active { display: block; }
+```
+
+### Notes
+- **All three depths describe the same fact** — only the wording changes. The ELI5 pane must not be "wrong but simple"; it's the honest core idea minus the jargon (mirrors Principle 9: depth changes wording, never substance).
+- Keep it honest (Principle 6a): if the intern pane mentions a cost/token trade-off, the ELI5 pane must not pretend the cost vanishes.
+- Default the visible pane to the page's overall level (`data-depth` + matching `is-active`) so the widget opens at the depth the reader picked.
+- **Don't overuse.** If every term becomes a tabbed widget, the page turns into a control panel. Reserve for the 1-3 genuinely load-bearing concepts.
+- Tab switching is an instant display swap (no motion), so it's `prefers-reduced-motion`-safe by default.
